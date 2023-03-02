@@ -1,15 +1,26 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import context from "../contextAPI/context";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import UserIcon from "../sources/user.png";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const clickFollowingRef = useRef(null);
   const contextBlog = useContext(context);
-  const { loadBlog, userBlog, user, getUserDetails, userDetails } = contextBlog;
+  const {
+    loadBlog,
+    userBlog,
+    user,
+    getUserDetails,
+    userDetails,
+    alluser,
+    loadUser,
+  } = contextBlog;
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
       loadBlog();
+      loadUser();
       getUserDetails();
     } else {
       navigate("./login");
@@ -25,9 +36,165 @@ export default function Profile() {
   const handleEditProfile = () => {
     navigate("../userdetails");
   };
+  const handleFollowing = () => {
+    clickFollowingRef.current.click();
+  };
 
   return (
     <div>
+      <button
+        ref={clickFollowingRef}
+        type="button"
+        className="btn btn-primary d-none"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+      >
+        Launch demo modal
+      </button>
+
+      <div
+        className="modal fade"
+        id="exampleModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">
+                Following
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body d-flex justify-content-center">
+              <div
+                className=""
+                style={{
+                  borderRadius: "10px",
+                }}
+              >
+                {alluser.length > 0
+                  ? alluser
+                      .filter((users) => {
+                        return users.userid !== user._id;
+                      })
+                      .map((alluser) => {
+                        return (
+                          <div
+                            className="card d-flex justify-content-center align-items-center my-3 shadow-lg"
+                            style={{
+                              borderRadius: "15px",
+                              width: "22vw",
+                              backgroundColor: "inherit",
+                            }}
+                            key={alluser._id}
+                          >
+                            <div className="card-body p-2 ">
+                              <div className="d-flex  flex-column flex-xxl-row text-black  ">
+                                <div className="d-flex justify-content-evenly align-items-center">
+                                  <img
+                                    src={
+                                      alluser.profileImg
+                                        ? alluser.profileImg
+                                        : UserIcon
+                                    }
+                                    alt="Generic placeholder"
+                                    className="img-fluid "
+                                    style={{
+                                      width: "80%",
+                                      height: "80%",
+                                      minWidth: "50px",
+                                      minHeight: "50px",
+                                      borderRadius: "10px",
+                                    }}
+                                  />
+                                </div>
+                                <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
+                                  <div className="text-center ">
+                                    <h6 className="mb-1 ">
+                                      {alluser.user.name}
+                                    </h6>
+                                    <p
+                                      className="mb-1 pb-1"
+                                      style={{
+                                        color: "#2b2a2a",
+                                        fontSize: "0.8em",
+                                      }}
+                                    >
+                                      {alluser.profession}
+                                    </p>
+                                  </div>
+                                  <div
+                                    className=" rounded-3 py-1 px-2 mb-2"
+                                    style={{ backgroundColor: "#efefef" }}
+                                  >
+                                    <div className="d-flex justify-content-center text-center">
+                                      <div>
+                                        <p className="small text-muted mb-1">
+                                          Post
+                                        </p>
+                                        <p className="mb-0">
+                                          {alluser.noOfPost}
+                                        </p>
+                                      </div>
+                                      <div className="px-3">
+                                        <p className="small text-muted mb-1">
+                                          Followers
+                                        </p>
+                                        <p className="mb-0">
+                                          {alluser.follower.length}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <p className="small text-muted mb-1">
+                                          Following
+                                        </p>
+                                        <p className="mb-0">
+                                          {alluser.following.length}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="d-flex pt-1">
+                                      <button
+                                        type="button"
+                                        className="btn btn-primary flex-grow-1 "
+                                        onClick={() =>
+                                          handleFollow(alluser.userid)
+                                        }
+                                      >
+                                        {alluser.follower.includes(user._id)
+                                          ? "Following"
+                                          : "Follow"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                  : ""}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <section className="h-100 gradient-custom-2 w-100" style={{}}>
         <div className=" py-0 h-100 w-100">
           <div className="row d-flex justify-content-center align-items-center h-100">
@@ -42,10 +209,19 @@ export default function Profile() {
                     style={{ width: "150px" }}
                   >
                     <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+                      src={
+                        userDetails.length > 0
+                          ? userDetails[0].profileImg
+                          : UserIcon
+                      }
                       alt="Generic placeholder"
                       className="img-fluid img-thumbnail mt-2 mt-sm-4 mb-2"
-                      style={{ width: "150px", zIndex: " 1" }}
+                      style={{
+                        width: "150px",
+                        minHeight: "150px",
+                        height: "150px",
+                        zIndex: " 1",
+                      }}
                     />
                     <button
                       type="button"
@@ -58,7 +234,13 @@ export default function Profile() {
                     </button>
                   </div>
                   <div className="ms-3" style={{ marginTop: "110px" }}>
-                    <h5>{user.name}</h5>
+                    <h5>
+                      {userDetails.length > 0
+                        ? `${capitaliz(userDetails[0].firstName)} ${capitaliz(
+                            userDetails[0].lastName
+                          )}`
+                        : ""}
+                    </h5>
                     <p className="">
                       {userDetails.length > 0
                         ? `${capitaliz(userDetails[0].city)}, ${capitaliz(
@@ -80,12 +262,25 @@ export default function Profile() {
                       <p className="small text-muted mb-0">Photos</p>
                     </div>
                     <div className="text-center  mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
-                      <p className="mb-1 h5">1026</p>
+                      <p className="mb-1 h5">
+                        {userDetails.length > 0
+                          ? userDetails[0].follower.length
+                          : "0"}
+                      </p>
                       <p className="small text-muted mb-0">Followers</p>
                     </div>
                     <div className="text-center  mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
-                      <p className="mb-1 h5">478</p>
-                      <p className="small text-muted mb-0">Following</p>
+                      <p className="mb-1 h5">
+                        {userDetails.length > 0
+                          ? userDetails[0].following.length
+                          : "0"}
+                      </p>
+                      <button
+                        className="small text-muted mb-0"
+                        onClick={handleFollowing}
+                      >
+                        Following
+                      </button>
                     </div>
                   </div>
                 </div>

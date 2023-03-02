@@ -9,16 +9,11 @@ export default function Home() {
   const clickEdit = useRef(null);
   const navigate = useNavigate();
   const contextBlog = useContext(context);
-  const {
-    loadBlog,
-    userBlog,
-    user,
-    alluser,
-    loadUser,
-    setBlogCount,
-    setFollowing,
-  } = contextBlog;
+  const { loadBlog, userBlog, user, loadUser, setBlogCount, setFollowing } =
+    contextBlog;
   const [editClick, setEditClick] = useState(false);
+  const [alluser, setAlluser] = useState([]);
+  const [clickFollowBtn, setClickFollowBtn] = useState(false);
 
   const saveToServer = () => {
     loadBlog();
@@ -28,12 +23,14 @@ export default function Home() {
     setEditClick(false);
   };
 
-  console.log("alluser ", alluser);
+  const loadData = async () => {
+    setAlluser(await loadUser());
+  };
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
       loadBlog();
-      loadUser();
+      loadData();
       setBlogCount();
     } else {
       navigate("./login");
@@ -46,9 +43,61 @@ export default function Home() {
     setEditClick(blog);
   };
 
-  const handleFollow = (id) => {
-    let userid = { folloing: id };
+  const handleFollow = async (id) => {
+    let userid = { id: id };
     setFollowing(userid);
+
+    let allUser = alluser;
+    for (let index = 0; index < allUser.length; index++) {
+      const element = allUser[index];
+      if (element.userid === id) {
+        const include = element.follower.includes(user._id);
+        if (include === true) {
+          let follower = element.follower.filter((d) => {
+            return d !== user._id;
+          });
+          let updateduser = {
+            ...element,
+            follower: [...follower],
+          };
+          allUser[index] = updateduser;
+        } else {
+          let updateduser = {
+            ...element,
+            follower: [...element.follower, user._id],
+          };
+          allUser[index] = updateduser;
+        }
+        break;
+      }
+    }
+
+    for (let index = 0; index < allUser.length; index++) {
+      const element = allUser[index];
+      if (element.userid === user._id) {
+        const include = element.following.includes(id);
+
+        if (include === true) {
+          let following = element.following.filter((d) => {
+            return d !== id;
+          });
+          let updateduser = {
+            ...element,
+            following: [...following],
+          };
+          allUser[index] = updateduser;
+        } else {
+          let updateduser = {
+            ...element,
+            following: [...element.following, id],
+          };
+          allUser[index] = updateduser;
+        }
+        break;
+      }
+    }
+
+    setAlluser(allUser);
   };
 
   return (
@@ -60,86 +109,94 @@ export default function Home() {
         }}
       >
         <h4 className="text-center">Users</h4>
-        {alluser
-          ? alluser.map((alluser) => {
-              return (
-                <div
-                  className="card d-flex justify-content-center align-items-center my-3"
-                  style={{
-                    borderRadius: "15px",
-                    width: "22vw",
-                    backgroundColor: "inherit",
-                  }}
-                  key={alluser._id}
-                >
-                  <div className="card-body p-2 ">
-                    <div className="d-flex  flex-column flex-xxl-row text-black  ">
-                      <div className="d-flex justify-content-evenly align-items-center">
-                        <img
-                          src={
-                            alluser.profileImg ? alluser.profileImg : UserIcon
-                          }
-                          alt="Generic placeholder"
-                          className="img-fluid "
-                          style={{
-                            width: "80%",
-                            height: "80%",
-                            minWidth: "50px",
-                            minHeight: "50px",
-                            borderRadius: "10px",
-                          }}
-                        />
-                      </div>
-                      <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
-                        <div className="text-center ">
-                          <h6 className="mb-1 ">{alluser.user.name}</h6>
-                          <p
-                            className="mb-1 pb-1"
-                            style={{ color: "#2b2a2a", fontSize: "0.8em" }}
-                          >
-                            {alluser.profession}
-                          </p>
+        {alluser.length > 0
+          ? alluser
+              .filter((users) => {
+                return users.userid !== user._id;
+              })
+              .map((alluser) => {
+                return (
+                  <div
+                    className="card d-flex justify-content-center align-items-center my-3"
+                    style={{
+                      borderRadius: "15px",
+                      width: "22vw",
+                      backgroundColor: "inherit",
+                    }}
+                    key={alluser._id}
+                  >
+                    <div className="card-body p-2 ">
+                      <div className="d-flex  flex-column flex-xxl-row text-black  ">
+                        <div className="d-flex justify-content-evenly align-items-center">
+                          <img
+                            src={
+                              alluser.profileImg ? alluser.profileImg : UserIcon
+                            }
+                            alt="Generic placeholder"
+                            className="img-fluid "
+                            style={{
+                              width: "80%",
+                              height: "80%",
+                              minWidth: "50px",
+                              minHeight: "50px",
+                              borderRadius: "10px",
+                            }}
+                          />
                         </div>
-                        <div
-                          className=" rounded-3 py-1 px-2 mb-2"
-                          style={{ backgroundColor: "#efefef" }}
-                        >
-                          <div className="d-flex justify-content-center text-center">
-                            <div>
-                              <p className="small text-muted mb-1">Post</p>
-                              <p className="mb-0">{alluser.noOfPost}</p>
-                            </div>
-                            <div className="px-3">
-                              <p className="small text-muted mb-1">Followers</p>
-                              <p className="mb-0">976</p>
-                            </div>
-                            <div>
-                              <p className="small text-muted mb-1">Rating</p>
-                              <p className="mb-0">8.5</p>
-                            </div>
+                        <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
+                          <div className="text-center ">
+                            <h6 className="mb-1 ">{alluser.user.name}</h6>
+                            <p
+                              className="mb-1 pb-1"
+                              style={{ color: "#2b2a2a", fontSize: "0.8em" }}
+                            >
+                              {alluser.profession}
+                            </p>
                           </div>
-                          <div className="d-flex pt-1">
-                            <button
-                              type="button"
-                              className="btn btn-outline-primary me-1 flex-grow-1"
-                            >
-                              Unfollow
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-primary flex-grow-1 "
-                              onClick={() => handleFollow(alluser.userid)}
-                            >
-                              follow
-                            </button>
+                          <div
+                            className=" rounded-3 py-1 px-2 mb-2"
+                            style={{ backgroundColor: "#efefef" }}
+                          >
+                            <div className="d-flex justify-content-center text-center">
+                              <div>
+                                <p className="small text-muted mb-1">Post</p>
+                                <p className="mb-0">{alluser.noOfPost}</p>
+                              </div>
+                              <div className="px-3">
+                                <p className="small text-muted mb-1">
+                                  Followers
+                                </p>
+                                <p className="mb-0">
+                                  {alluser.follower.length}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="small text-muted mb-1">
+                                  Following
+                                </p>
+                                <p className="mb-0">
+                                  {alluser.following.length}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="d-flex pt-1">
+                              <button
+                                type="button"
+                                className="btn btn-primary flex-grow-1 "
+                                onClick={() => handleFollow(alluser.userid)}
+                              >
+                                {alluser.follower.includes(user._id)
+                                  ? "Following"
+                                  : "Follow"}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })
           : ""}
       </div>
       <div
@@ -192,7 +249,6 @@ export default function Home() {
                   <div
                     key={blog._id}
                     className="m-3"
-
                     // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
                   >
                     <Blogcard

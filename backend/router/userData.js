@@ -11,6 +11,7 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
     const userId = await req.userid;
     const user = await User.findById(userId).select("-password");
     let details = await UserDetails.findOne({ userid: userId });
+    const blogs = await blog.find({ userid: userId });
     const {
       firstName,
       lastName,
@@ -37,6 +38,7 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
       pincode: pincode,
       profession: profession,
       profileImg: profileImg,
+      noOfPost: blogs.length,
     };
 
     if (user) {
@@ -54,6 +56,8 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
           pincode: pincode,
           profession: profession,
           profileImg: profileImg,
+          noOfPost: blogs.length,
+          following: [],
         });
         const createUserDetails = await userDetails.save();
         res.status(200).json({
@@ -106,7 +110,6 @@ router.get("/getalluser", async (req, res) => {
 router.put("/setblogcount", fetchuser, async (req, res) => {
   try {
     const blogs = await blog.find({ userid: req.userid });
-    // const userDetails = await UserDetails.findOne({ userid: req.userid });
     const count = {
       noOfPost: blogs.length,
     };
@@ -121,116 +124,67 @@ router.put("/setblogcount", fetchuser, async (req, res) => {
   }
 });
 
-// router.put("/setfollower", fetchuser, async (req, res) => {
-//   try {
-//     const blogs = await blog.find({ userid: req.userid });
-//     const count = {
-//       noOfPost: blogs.length,
-//     };
-//     const details = await UserDetails.findOneAndUpdate(
-//       { userid: req.userid },
-//       { follower: [...follower, req.body] }
-//     );
-//     console.log("count : ", details);
-//     res
-//       .status(200)
-//       .json({ success: true, follower: details.follower, msg: "Loaded" });
-//   } catch (error) {
-//     res.status(400).json({ success: false, error: "Internel server error" });
-//   }
-// });
-
 router.put("/setfollowing", fetchuser, async (req, res) => {
   try {
-    console.log("count : ");
-    const details = await UserDetails.findOneAndUpdate(
-      { userid: req.userid },
-      { following: [req.body.following] }
-    );
-    res
-      .status(200)
-      .json({ success: true, follower: details.follower, msg: "Loaded" });
+    const followingID = req.body.id;
+    const oldDetails = await UserDetails.find({ userid: req.userid });
+    const oldFollowing = oldDetails[0].following;
+    const include = oldFollowing.includes(followingID.toString());
+    if (!include && followingID !== req.userid) {
+      const details = await UserDetails.findOneAndUpdate(
+        { userid: req.userid },
+        { $push: { following: followingID } },
+        { new: true }
+      );
+      const addFollower = await UserDetails.findOneAndUpdate(
+        { userid: followingID },
+        { $push: { follower: req.userid } },
+        { new: true }
+      );
+      res.status(200).json({
+        success: true,
+        msg: "Follow done",
+      });
+      console.log("follow");
+    } else {
+      const unFollowId = req.body.id;
+      const details = await UserDetails.findOneAndUpdate(
+        { userid: req.userid },
+        { $pull: { following: unFollowId } }
+      );
+      const addFollower = await UserDetails.findOneAndUpdate(
+        { userid: unFollowId },
+        { $pull: { follower: req.userid } }
+      );
+      res.status(200).json({
+        success: true,
+        msg: "Unfollow done",
+      });
+      console.log("unfollow");
+    }
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });
 
-// router.get("/setfollower",fetchuser, async (req, res) => {
-//   try {
-//     const details = await UserDetails.find();
-//     res.status(200).json({ success: true, details: details, msg: "Loaded" });
-//   } catch (error) {
-//     res.status(400).json({ success: false, error: "Internel server error" });
-//   }
-// });
-
-// router.get("/setfollowing", async (req, res) => {
-//   try {
-//     const details = await UserDetails.find();
-//     res.status(200).json({ success: true, details: details, msg: "Loaded" });
-//   } catch (error) {
-//     res.status(400).json({ success: false, error: "Internel server error" });
-//   }
-// });
-
-// router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
-//   try {
-//     const getblog = await blog.findById(req.params.id);
-//     if (!getblog) {
-//       return res.status(400).json({ success: false, error: "Not Found" });
-//     }
-//     if (getblog.userid.toString() !== req.userid) {
-//       return res.status(400).json({ success: false, error: "Not Allowed" });
-//     }
-//     const deleteblog = await blog.findByIdAndRemove(req.params.id);
-//     res.status(200).json({ success: true, deleteblog: deleteblog });
-//   } catch (error) {
-//     return res
-//       .status(400)
-//       .json({ success: false, error: "Internal server error" });
-//   }
-// });
-
-// router.put(
-//   "/editblog/:id",
-//   fetchuser,
-//   [body("topic").isString(), body("userid"), body("description").isString()],
-//   async (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-//     try {
-//       const { topic, description, comment, upVote, downVote, src } = req.body;
-//       const userId = await req.userid;
-//       const updatedBlog = {
-//         userid: userId,
-//         topic: topic,
-//         description: description,
-//         src: src,
-//         comment: comment,
-//         upVote: upVote,
-//         downVote: downVote,
-//       };
-//       let getblog = await blog.findById(req.params.id);
-//       if (!getblog) {
-//         return res.status(400).json({ success: false, error: "Not Found" });
-//       }
-//       if (getblog.userid.toString() !== userId) {
-//         return res.status(400).json({ success: false, error: "Not Allowed" });
-//       }
-//       getblog = await blog.findByIdAndUpdate(
-//         req.params.id,
-//         { $set: updatedBlog },
-//         { new: true }
-//       );
-//       res.status(200).json({ success: true, getblog: getblog });
-//     } catch (error) {
-//       return res
-//         .status(400)
-//         .json({ success: false, error: "Internal server error" });
-//     }
-//   }
-// );
+router.put("/setunfollow", fetchuser, async (req, res) => {
+  try {
+    const unFollowId = req.body.id;
+    const details = await UserDetails.findOneAndUpdate(
+      { userid: req.userid },
+      { $pull: { following: unFollowId } }
+    );
+    const addFollower = await UserDetails.findOneAndUpdate(
+      { userid: unFollowId },
+      { $pull: { follower: req.userid } }
+    );
+    res.status(200).json({
+      success: true,
+      msg: "Unfollow done",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
 
 module.exports = router;

@@ -42,8 +42,10 @@ function ContextBlog(props) {
     });
     const res = await response.json();
     if (res.success) {
+      const alluser = res.details;
       setAllUser(res.details);
       showAlert(res.msg, "success");
+      return res.details;
     } else {
       showAlert(res.error, "danger");
     }
@@ -128,7 +130,6 @@ function ContextBlog(props) {
     const res = await response.json();
     if (res.success) {
       const { details } = res;
-      console.log(details);
       setUserDetails([details]);
       showAlert(res.msg, "success");
     } else {
@@ -179,7 +180,22 @@ function ContextBlog(props) {
     });
     const res = await response.json();
     if (res.success) {
-      console.log("RES follower :", res.follower);
+      showAlert(res.msg, "success");
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const setUnfollow = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/user/setunfollow", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+      body: JSON.stringify(id),
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
     } else {
       showAlert(res.error, "danger");
     }
@@ -211,6 +227,7 @@ function ContextBlog(props) {
         reset,
         setBlogCount,
         setFollowing,
+        setUnfollow,
       }}
     >
       {props.children}

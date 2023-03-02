@@ -47,6 +47,12 @@ const userDetailsSchema = mongoose.Schema({
   noOfPost: {
     type: Number,
   },
+  following: {
+    type: Array,
+  },
+  follower: {
+    type: Array,
+  },
   userid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userid",
