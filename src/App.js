@@ -12,7 +12,7 @@ import ContextBlog from "./contextAPI/ContextBlog";
 
 function App() {
   return (
-    <>
+    <div>
       <ContextBlog>
         <Router>
           <div className="fixed-top">
@@ -33,7 +33,7 @@ function App() {
           </div>
         </Router>
       </ContextBlog>
-    </>
+    </div>
   );
 }
 

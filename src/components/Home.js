@@ -9,7 +9,15 @@ export default function Home() {
   const clickEdit = useRef(null);
   const navigate = useNavigate();
   const contextBlog = useContext(context);
-  const { loadBlog, userBlog, user, alluser, loadUser } = contextBlog;
+  const {
+    loadBlog,
+    userBlog,
+    user,
+    alluser,
+    loadUser,
+    setBlogCount,
+    setFollowing,
+  } = contextBlog;
   const [editClick, setEditClick] = useState(false);
 
   const saveToServer = () => {
@@ -26,6 +34,7 @@ export default function Home() {
     if (localStorage.getItem("blogToken")) {
       loadBlog();
       loadUser();
+      setBlogCount();
     } else {
       navigate("./login");
     }
@@ -37,6 +46,11 @@ export default function Home() {
     setEditClick(blog);
   };
 
+  const handleFollow = (id) => {
+    let userid = { folloing: id };
+    setFollowing(userid);
+  };
+
   return (
     <div className="d-flex">
       <div
@@ -45,13 +59,18 @@ export default function Home() {
           borderRadius: "10px",
         }}
       >
-      <h4 className="text-center">Users</h4>
+        <h4 className="text-center">Users</h4>
         {alluser
           ? alluser.map((alluser) => {
               return (
                 <div
                   className="card d-flex justify-content-center align-items-center my-3"
-                  style={{ borderRadius: "15px", width: "22vw",backgroundColor:"inherit" }}
+                  style={{
+                    borderRadius: "15px",
+                    width: "22vw",
+                    backgroundColor: "inherit",
+                  }}
+                  key={alluser._id}
                 >
                   <div className="card-body p-2 ">
                     <div className="d-flex  flex-column flex-xxl-row text-black  ">
@@ -88,7 +107,7 @@ export default function Home() {
                           <div className="d-flex justify-content-center text-center">
                             <div>
                               <p className="small text-muted mb-1">Post</p>
-                              <p className="mb-0">41</p>
+                              <p className="mb-0">{alluser.noOfPost}</p>
                             </div>
                             <div className="px-3">
                               <p className="small text-muted mb-1">Followers</p>
@@ -109,8 +128,9 @@ export default function Home() {
                             <button
                               type="button"
                               className="btn btn-primary flex-grow-1 "
+                              onClick={() => handleFollow(alluser.userid)}
                             >
-                              Following
+                              follow
                             </button>
                           </div>
                         </div>
@@ -172,7 +192,7 @@ export default function Home() {
                   <div
                     key={blog._id}
                     className="m-3"
-                   
+
                     // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
                   >
                     <Blogcard

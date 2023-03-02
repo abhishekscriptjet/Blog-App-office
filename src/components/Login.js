@@ -86,7 +86,7 @@ export default function Login() {
               />
               <label htmlFor="email">Email address</label>
             </div>
-            
+
             <div className="form-floating">
               <input
                 type="password"

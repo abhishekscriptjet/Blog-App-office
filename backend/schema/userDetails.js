@@ -44,14 +44,17 @@ const userDetailsSchema = mongoose.Schema({
     type: Object,
     require: true,
   },
+  noOfPost: {
+    type: Number,
+  },
   userid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userid",
   },
-  userDetailsDate:{
+  userDetailsDate: {
     type: Date,
     default: new Date(),
-  }
+  },
 });
 
 const UserDetails = mongoose.model("userDetails", userDetailsSchema);

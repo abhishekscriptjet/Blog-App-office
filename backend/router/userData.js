@@ -3,6 +3,7 @@ const UserDetails = require("../schema/userDetails");
 const { body, validationResult } = require("express-validator");
 const fetchuser = require("./fetchUser");
 const User = require("../schema/user");
+const blog = require("../schema/blog");
 const router = express.Router();
 
 router.post("/createuserdetails", fetchuser, async (req, res) => {
@@ -96,12 +97,81 @@ router.get("/getuserdetails", fetchuser, async (req, res) => {
 router.get("/getalluser", async (req, res) => {
   try {
     const details = await UserDetails.find();
-    console.log("all user : ",details)
     res.status(200).json({ success: true, details: details, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });
+
+router.put("/setblogcount", fetchuser, async (req, res) => {
+  try {
+    const blogs = await blog.find({ userid: req.userid });
+    // const userDetails = await UserDetails.findOne({ userid: req.userid });
+    const count = {
+      noOfPost: blogs.length,
+    };
+
+    const details = await UserDetails.findOneAndUpdate(
+      { userid: req.userid },
+      { noOfPost: blogs.length }
+    );
+    res.status(200).json({ success: true, count: blogs.length, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+// router.put("/setfollower", fetchuser, async (req, res) => {
+//   try {
+//     const blogs = await blog.find({ userid: req.userid });
+//     const count = {
+//       noOfPost: blogs.length,
+//     };
+//     const details = await UserDetails.findOneAndUpdate(
+//       { userid: req.userid },
+//       { follower: [...follower, req.body] }
+//     );
+//     console.log("count : ", details);
+//     res
+//       .status(200)
+//       .json({ success: true, follower: details.follower, msg: "Loaded" });
+//   } catch (error) {
+//     res.status(400).json({ success: false, error: "Internel server error" });
+//   }
+// });
+
+router.put("/setfollowing", fetchuser, async (req, res) => {
+  try {
+    console.log("count : ");
+    const details = await UserDetails.findOneAndUpdate(
+      { userid: req.userid },
+      { following: [req.body.following] }
+    );
+    res
+      .status(200)
+      .json({ success: true, follower: details.follower, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+// router.get("/setfollower",fetchuser, async (req, res) => {
+//   try {
+//     const details = await UserDetails.find();
+//     res.status(200).json({ success: true, details: details, msg: "Loaded" });
+//   } catch (error) {
+//     res.status(400).json({ success: false, error: "Internel server error" });
+//   }
+// });
+
+// router.get("/setfollowing", async (req, res) => {
+//   try {
+//     const details = await UserDetails.find();
+//     res.status(200).json({ success: true, details: details, msg: "Loaded" });
+//   } catch (error) {
+//     res.status(400).json({ success: false, error: "Internel server error" });
+//   }
+// });
 
 // router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
 //   try {

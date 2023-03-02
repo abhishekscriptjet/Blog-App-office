@@ -1,12 +1,12 @@
-import React, { useState,useContext } from "react";
-import context  from "../contextAPI/context";
+import React, { useState, useContext } from "react";
+import context from "../contextAPI/context";
 import UserIcon from "../sources/user.png";
 
 export default function Blogcard(props) {
   const { topic, description, src, _id } = props.blog;
-  const alertContext = useContext(context)
-  const {deleteEndPoint} = alertContext
-  
+  const alertContext = useContext(context);
+  const { deleteEndPoint } = alertContext;
+
   const { name } = props.user;
   const [like, setLike] = useState("regular");
   const [dislike, setDisLike] = useState("fa-heart");
@@ -47,16 +47,23 @@ export default function Blogcard(props) {
   };
 
   const handleDelete = async () => {
-    deleteEndPoint(_id)
+    deleteEndPoint(_id);
   };
 
-  const handleEdit = async()=>{
-    props.handleEditClick(props.blog)
-    console.log("edit")
-  }
+  const handleEdit = async () => {
+    props.handleEditClick(props.blog);
+    console.log("edit");
+  };
 
   return (
-    <div className="card" style={{ width: "25rem",backgroundColor:"inherit",borderRadius:"10px" }}>
+    <div
+      className="card"
+      style={{
+        width: "25rem",
+        backgroundColor: "inherit",
+        borderRadius: "10px",
+      }}
+    >
       <div className="d-flex justify-content-left align-items-center mx-3 my-1">
         <img src={UserIcon} className="" alt="" width="25" />
         <p className="text-muted p-2 m-0">{name}</p>
@@ -81,7 +88,10 @@ export default function Blogcard(props) {
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <button className="dropdown-item fw-bold fs-6 text-success" onClick={handleEdit}>
+              <button
+                className="dropdown-item fw-bold fs-6 text-success"
+                onClick={handleEdit}
+              >
                 Edit
               </button>
             </li>

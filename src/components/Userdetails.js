@@ -7,14 +7,14 @@ import { useNavigate } from "react-router-dom";
 const Userdetails = (props) => {
   const pictureInput = useRef(null);
   const fileInputRef = useRef(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const contextBlog = useContext(context);
   const { createUserDetails, userDetails, getUserDetails } = contextBlog;
 
   const [picture, setPicture] = useState(null);
 
-  const [details, setDetails] = useState(0)
+  const [details, setDetails] = useState(0);
   const [country, setCountry] = useState([]);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
@@ -869,7 +869,7 @@ const Userdetails = (props) => {
       };
       createUserDetails(details);
       setIsSubmit(false);
-      navigate("../profile")
+      navigate("../profile");
     }
   };
 
@@ -975,48 +975,45 @@ const Userdetails = (props) => {
     return errors;
   };
 
-  const loadState=(id)=>{
+  const loadState = (id) => {
     let stateOfCountry = states.filter((item) => item.countryId === id);
-  setState(stateOfCountry);
-  }
-  const loadCity=(id)=>{
+    setState(stateOfCountry);
+  };
+  const loadCity = (id) => {
     let cityOfState = cities.filter((item) => item.stateId === id);
     setCity(cityOfState);
-  }
+  };
 
-  const loadDetails =()=>{
-    if(userDetails.length>0){
-      let detail = userDetails[0]
+  const loadDetails = () => {
+    if (userDetails.length > 0) {
+      let detail = userDetails[0];
       setName({
-    ...detail
+        ...detail,
       });
-      loadState(detail.country)
-      loadCity(detail.state)
+      loadState(detail.country);
+      loadCity(detail.state);
       setPicture(userDetails[0].profileImg);
-    }else{
-      console.log("Loading...")
+    } else {
+      console.log("Loading...");
     }
-  }
+  };
 
   useEffect(() => {
-    setCountry(countries); 
+    setCountry(countries);
     quotesAPI();
-    getUserDetails()
+    getUserDetails();
     setTimeout(() => {
-      setDetails(1)
+      setDetails(1);
     }, 1000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
     clearData();
-    loadDetails()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [details])
-  
+    loadDetails();
+  }, [details]);
+
   useEffect(() => {
     setFormError(validate(name));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, picture]);
 
   const handleSubmit = () => {
@@ -1050,7 +1047,7 @@ const Userdetails = (props) => {
 
   const countryHandle = (e) => {
     let id = e.target.value;
-    loadState(id)  
+    loadState(id);
     let country = { ...name, country: id };
     let reset = { ...name, state: "0", city: "0", country: "0" };
     setName(country);
@@ -1062,12 +1059,12 @@ const Userdetails = (props) => {
 
   const stateHandle = (e) => {
     let id = e.target.value;
-    loadCity(id)
+    loadCity(id);
     let state = { ...name, state: id };
     let reset = { ...name, state: "0", city: "0" };
     if (id === "0") {
       setName(reset);
-    }else{
+    } else {
       setName(state);
     }
   };
@@ -1077,8 +1074,6 @@ const Userdetails = (props) => {
     let city = { ...name, city: id };
     setName(city);
   };
-
-  
 
   return (
     <div>
@@ -1094,7 +1089,6 @@ const Userdetails = (props) => {
             height: "125vh",
             position: "relative",
             filter: "brightness(0.5)",
-            opacity: "0.5",
           }}
           height="800"
           alt="bg"

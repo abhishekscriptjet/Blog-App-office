@@ -1,25 +1,28 @@
-import React,{useContext} from "react";
+import React, { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import icon from "../sources/navicon.png";
-import context  from "../contextAPI/context";
+import context from "../contextAPI/context";
 
 export default function Navebar() {
-  const alertContext = useContext(context)
-  const {showAlert,reset} = alertContext
+  const alertContext = useContext(context);
+  const { showAlert, reset } = alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
   const handleLogout = (e) => {
     localStorage.removeItem("blogToken");
-    reset()
-    showAlert("Logout Successfully.", "success")
+    reset();
+    showAlert("Logout Successfully.", "success");
     navigate("/login");
   };
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
-          <Link className="navbar-brand" to={localStorage.getItem("blogToken") ? "/" : "/login"}>
+          <Link
+            className="navbar-brand"
+            to={localStorage.getItem("blogToken") ? "/" : "/login"}
+          >
             <img src={icon} className="mx-3" alt="icon" width="40" />
           </Link>
           <button
@@ -51,7 +54,9 @@ export default function Navebar() {
                   className={`nav-link ${
                     location.pathname === "/profile" ? "active" : ""
                   }`}
-                  to={localStorage.getItem("blogToken") ? "/profile " : "/login"}
+                  to={
+                    localStorage.getItem("blogToken") ? "/profile " : "/login"
+                  }
                 >
                   Profile
                 </Link>
@@ -104,12 +109,12 @@ export default function Navebar() {
             {!localStorage.getItem("blogToken") ? (
               <div className="mx-4 my-1 py-1 border-start">
                 <div className="mx-3">
-                <Link className="btn btn-primary mx-2 py-1" to="/login">
-                  Login
-                </Link>
-                <Link className="btn btn-primary mx-0 py-1" to="/signup">
-                  Signup
-                </Link>
+                  <Link className="btn btn-primary mx-2 py-1" to="/login">
+                    Login
+                  </Link>
+                  <Link className="btn btn-primary mx-0 py-1" to="/signup">
+                    Signup
+                  </Link>
                 </div>
               </div>
             ) : (
