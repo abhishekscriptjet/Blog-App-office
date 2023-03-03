@@ -145,7 +145,6 @@ router.put("/setfollowing", fetchuser, async (req, res) => {
         success: true,
         msg: "Follow done",
       });
-      console.log("follow");
     } else {
       const unFollowId = req.body.id;
       const details = await UserDetails.findOneAndUpdate(
@@ -160,7 +159,6 @@ router.put("/setfollowing", fetchuser, async (req, res) => {
         success: true,
         msg: "Unfollow done",
       });
-      console.log("unfollow");
     }
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
@@ -181,6 +179,36 @@ router.put("/setunfollow", fetchuser, async (req, res) => {
     res.status(200).json({
       success: true,
       msg: "Unfollow done",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.get("/getfollowing", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.userid });
+    const following = details[0].following;
+    const followingDetails = await UserDetails.find({ userid: following });
+    res.status(200).json({
+      success: true,
+      followingDetails: followingDetails,
+      msg: "Get Following",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.get("/getfollower", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.userid });
+    const follower = details[0].follower;
+    const followerDetails = await UserDetails.find({ userid: follower });
+    res.status(200).json({
+      success: true,
+      followerDetails: followerDetails,
+      msg: "Get Follower",
     });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });

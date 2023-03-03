@@ -65,7 +65,6 @@ function ContextBlog(props) {
     );
     const res = await response.json();
     if (res.success) {
-      console.log(res.deleteblog);
       const deletedBlog = userBlog.filter((blog) => blog._id !== id);
       setUserBlog(deletedBlog);
       showAlert("Blog deleted Successfully.", "success");
@@ -100,7 +99,6 @@ function ContextBlog(props) {
     });
     const res = await response.json();
     if (res.success) {
-      console.log("edit", res.getblog);
       const blogArray = userBlog;
       for (let index = 0; index < blogArray.length; index++) {
         const element = blogArray[index];
@@ -118,7 +116,7 @@ function ContextBlog(props) {
 
   const createUserDetails = async (details) => {
     const user = localStorage.getItem("blogToken");
-    console.log("details ", details);
+
     const response = await fetch(
       "http://localhost:5000/user/createuserdetails",
       {
@@ -148,7 +146,6 @@ function ContextBlog(props) {
       if (res.details.length === 0) {
         return false;
       }
-      console.log("RES details :", res.details);
       setUserDetails([...res.details]);
       showAlert(res.msg, "success");
       return true;
@@ -165,7 +162,6 @@ function ContextBlog(props) {
     });
     const res = await response.json();
     if (res.success) {
-      console.log("RES count :", res.count);
     } else {
       showAlert(res.error, "danger");
     }
@@ -201,6 +197,36 @@ function ContextBlog(props) {
     }
   };
 
+  const getFollowing = async () => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/user/getfollowing", {
+      method: "GET",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.followingDetails;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const getFollower = async () => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/user/getfollower", {
+      method: "GET",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.followerDetails;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -228,6 +254,8 @@ function ContextBlog(props) {
         setBlogCount,
         setFollowing,
         setUnfollow,
+        getFollowing,
+        getFollower,
       }}
     >
       {props.children}
