@@ -53,6 +53,12 @@ const userDetailsSchema = mongoose.Schema({
   follower: {
     type: Array,
   },
+  likedBlog: {
+    type: Array,
+  },
+  disLikedBlog: {
+    type: Array,
+  },
   userid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userid",

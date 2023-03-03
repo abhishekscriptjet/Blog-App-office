@@ -5,7 +5,7 @@ import UserIcon from "../sources/user.png";
 export default function Blogcard(props) {
   const { topic, description, src, _id } = props.blog;
   const alertContext = useContext(context);
-  const { deleteEndPoint } = alertContext;
+  const { deleteEndPoint, setLikebe, setDisLikebe } = alertContext;
 
   const { name } = props.user;
   const [like, setLike] = useState("regular");
@@ -14,6 +14,8 @@ export default function Blogcard(props) {
   const [clickDisLike, setClickDisLike] = useState(0);
 
   const handleLike = () => {
+    const likeID = { id: _id };
+    setLikebe(likeID);
     if (clickLike === 1) {
       setLike("regular");
       setClickLike(0);
@@ -30,6 +32,8 @@ export default function Blogcard(props) {
     }
   };
   const handleDisLike = () => {
+    const likeID = { id: _id };
+    setDisLikebe(likeID);
     if (clickDisLike === 1) {
       setDisLike("fa-heart");
       setClickDisLike(0);

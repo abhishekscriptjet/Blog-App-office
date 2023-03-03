@@ -58,6 +58,8 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
           profileImg: profileImg,
           noOfPost: blogs.length,
           following: [],
+          likedBlog: [],
+          disLikedBlog: [],
         });
         const createUserDetails = await userDetails.save();
         res.status(200).json({

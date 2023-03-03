@@ -6,18 +6,6 @@ const port = 5000;
 const host = "http://localhost";
 dbConnnect();
 
-// const storage = multer.diskStorage({
-//   destination:(req,file,cd)=>{
-//     cd(null,"uploads")
-//   },
-//   filename:(req,file,cd)=>{
-//     cd(null,file.originalname)
-//   },
-// })
-
-// const upload = multer({storage:storage})
-// module.exports = upload
-// fixing "413 Request Entity Too Large" errors
 app.use(express.json({ limit: "10mb", extended: true }));
 app.use(
   express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })

@@ -227,6 +227,37 @@ function ContextBlog(props) {
     }
   };
 
+  const setLikebe = async (id) => {
+    console.log("id ", id);
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/blog/setlike", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+      body: JSON.stringify(id),
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+  const setDisLikebe = async (id) => {
+    console.log("id ", id);
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/blog/setdislike", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+      body: JSON.stringify(id),
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -253,9 +284,10 @@ function ContextBlog(props) {
         reset,
         setBlogCount,
         setFollowing,
-        setUnfollow,
         getFollowing,
         getFollower,
+        setLikebe,
+        setDisLikebe,
       }}
     >
       {props.children}

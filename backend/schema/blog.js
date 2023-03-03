@@ -35,10 +35,10 @@ const blogSchema = mongoose.Schema({
     default: new Date(),
   },
   upVote: {
-    type: Number,
+    type: Array,
   },
   downVote: {
-    type: Number,
+    type: Array,
   },
 });
 
