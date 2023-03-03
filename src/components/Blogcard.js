@@ -1,17 +1,39 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import context from "../contextAPI/context";
 import UserIcon from "../sources/user.png";
 
 export default function Blogcard(props) {
-  const { topic, description, src, _id } = props.blog;
+  const { topic, description, src, _id, upVote, downVote, userid } = props.blog;
   const alertContext = useContext(context);
   const { deleteEndPoint, setLikebe, setDisLikebe } = alertContext;
-
-  const { name } = props.user;
+  const user = props.user;
   const [like, setLike] = useState("regular");
   const [dislike, setDisLike] = useState("fa-heart");
   const [clickLike, setClickLike] = useState(0);
   const [clickDisLike, setClickDisLike] = useState(0);
+  const [likeValue, setLikeValue] = useState();
+  const [disLikeValue, setDisLikeValue] = useState();
+
+  useEffect(() => {
+    if (upVote.includes(user._id)) {
+      setLikeValue(upVote.length);
+      setClickLike(1);
+      setLike("solid");
+    } else {
+      setClickLike(0);
+      setLikeValue(upVote.length);
+      setLike("regular");
+    }
+    if (downVote.includes(user._id)) {
+      setDisLikeValue(downVote.length);
+      setClickDisLike(1);
+      setDisLike("fa-heart-crack");
+    } else {
+      setDisLikeValue(downVote.length);
+      setClickDisLike(0);
+      setDisLike("fa-heart");
+    }
+  }, []);
 
   const handleLike = () => {
     const likeID = { id: _id };
@@ -19,34 +41,45 @@ export default function Blogcard(props) {
     if (clickLike === 1) {
       setLike("regular");
       setClickLike(0);
+      setLikeValue(likeValue - 1);
     } else if (clickLike === 0 && clickDisLike === 0) {
       setLike("solid");
       setDisLike("fa-heart");
       setClickDisLike(0);
+      setDisLikeValue(disLikeValue);
       setClickLike(1);
+      setLikeValue(likeValue + 1);
     } else {
       setLike("solid");
       setDisLike("fa-heart");
       setClickLike(1);
+      setLikeValue(likeValue + 1);
       setClickDisLike(0);
+      setDisLikeValue(disLikeValue - 1);
     }
   };
+
   const handleDisLike = () => {
     const likeID = { id: _id };
     setDisLikebe(likeID);
     if (clickDisLike === 1) {
       setDisLike("fa-heart");
       setClickDisLike(0);
+      setDisLikeValue(disLikeValue - 1);
     } else if (clickLike === 0 && clickDisLike === 0) {
       setDisLike("fa-heart-crack");
       setClickDisLike(1);
       setLike("regular");
       setClickLike(0);
+      setLikeValue(likeValue);
+      setDisLikeValue(disLikeValue + 1);
     } else {
       setDisLike("fa-heart-crack");
       setClickDisLike(1);
       setLike("regular");
       setClickLike(0);
+      setLikeValue(likeValue - 1);
+      setDisLikeValue(disLikeValue + 1);
     }
   };
 
@@ -56,7 +89,6 @@ export default function Blogcard(props) {
 
   const handleEdit = async () => {
     props.handleEditClick(props.blog);
-    console.log("edit");
   };
 
   return (
@@ -70,7 +102,7 @@ export default function Blogcard(props) {
     >
       <div className="d-flex justify-content-left align-items-center mx-3 my-1">
         <img src={UserIcon} className="" alt="" width="25" />
-        <p className="text-muted p-2 m-0">{name}</p>
+        <p className="text-muted p-2 m-0">{user.name}</p>
         <div className="drodown ms-auto">
           <i
             className="fa-solid fa-ellipsis p-2 btn "
@@ -120,14 +152,14 @@ export default function Blogcard(props) {
               className={`fa-${like} fa-heart text-danger fs-3`}
               onClick={handleLike}
             ></i>
-            <label className="fw-bold mx-2 ">0{clickLike}</label>
+            <label className="fw-bold mx-2 ">{likeValue}</label>
           </div>
           <div className=" mx-2">
             <i
               className={`fa-solid ${dislike} fs-3 text-black`}
               onClick={handleDisLike}
             ></i>
-            <label className="fw-bold mx-2">0{clickDisLike}</label>
+            <label className="fw-bold mx-2">{disLikeValue}</label>
           </div>
         </div>
         <hr className="my-0 mx-3" />

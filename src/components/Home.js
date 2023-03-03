@@ -9,11 +9,17 @@ export default function Home() {
   const clickEdit = useRef(null);
   const navigate = useNavigate();
   const contextBlog = useContext(context);
-  const { loadBlog, userBlog, user, loadUser, setBlogCount, setFollowing } =
-    contextBlog;
+  const {
+    loadBlog,
+    user,
+    loadUser,
+    setBlogCount,
+    setFollowing,
+    getFollowingBlog,
+  } = contextBlog;
   const [editClick, setEditClick] = useState(false);
   const [alluser, setAlluser] = useState([]);
-  const [clickFollowBtn, setClickFollowBtn] = useState(false);
+  const [userBlog, setUserBlog] = useState([]);
 
   const saveToServer = () => {
     loadBlog();
@@ -25,6 +31,7 @@ export default function Home() {
 
   const loadData = async () => {
     setAlluser(await loadUser());
+    setUserBlog(await getFollowingBlog());
   };
 
   useEffect(() => {

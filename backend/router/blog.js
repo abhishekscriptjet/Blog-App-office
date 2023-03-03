@@ -52,6 +52,23 @@ router.get("/getblog", fetchuser, async (req, res) => {
   }
 });
 
+router.get("/getfollowingblog", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.userid });
+    const following = details[0].following;
+    const followingBlog = await blog.find({
+      userid: [...following, req.userid],
+    });
+    res.status(200).json({
+      success: true,
+      followingBlog: followingBlog,
+      msg: "Get Following Blog",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
 router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
   try {
     const getblog = await blog.findById(req.params.id);

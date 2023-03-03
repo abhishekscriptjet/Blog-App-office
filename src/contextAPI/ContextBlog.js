@@ -258,6 +258,24 @@ function ContextBlog(props) {
     }
   };
 
+  const getFollowingBlog = async () => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/blog/getfollowingblog",
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.followingBlog;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -288,6 +306,7 @@ function ContextBlog(props) {
         getFollower,
         setLikebe,
         setDisLikebe,
+        getFollowingBlog,
       }}
     >
       {props.children}
