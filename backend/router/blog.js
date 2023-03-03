@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const express = require("express");
 const blog = require("../schema/blog");
 const { body, validationResult } = require("express-validator");
@@ -45,9 +46,9 @@ router.get("/getblog", fetchuser, async (req, res) => {
   try {
     const getblog = await blog.find({ userid: req.userid });
     const user = await User.findById(req.userid).select("-password");
-    res.status(200).json({ success: true, getblog, user,msg:"Loaded" });
+    res.status(200).json({ success: true, getblog, user, msg: "Loaded" });
   } catch (error) {
-    res.status(400).json({ success: false, error:"Internel server error" });
+    res.status(400).json({ success: false, error: "Internel server error" });
   }
 });
 

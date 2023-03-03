@@ -74,7 +74,6 @@ export default function Bloginput(props) {
     //eslint-disable-next-line
   }, [editClick]);
 
-
   const handleOnSubmit = async () => {
     closeRef.current.click();
     fileInputRef.current.value = "";

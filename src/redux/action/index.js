@@ -7,7 +7,6 @@ export const userData = (action) => {
   };
 };
 
-
 export const alert = (action) => {
   return (dispatch) => {
     dispatch({
