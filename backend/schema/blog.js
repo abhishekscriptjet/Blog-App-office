@@ -19,13 +19,13 @@ const blogSchema = mongoose.Schema({
   },
   comment: [
     {
-      user: {
+      commentUser: {
         type: String,
       },
       text: {
         type: String,
       },
-      date: {
+      commentDate: {
         type: Date,
       },
     },

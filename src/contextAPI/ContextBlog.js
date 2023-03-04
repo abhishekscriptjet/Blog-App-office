@@ -243,7 +243,6 @@ function ContextBlog(props) {
     }
   };
   const setDisLikebe = async (id) => {
-    console.log("id ", id);
     const user = localStorage.getItem("blogToken");
     const response = await fetch("http://localhost:5000/blog/setdislike", {
       method: "PUT",
@@ -271,6 +270,41 @@ function ContextBlog(props) {
     if (res.success) {
       showAlert(res.msg, "success");
       return res.followingBlog;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const getBlogUserDetailsBe = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/user/getbloguserdetails",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.details;
+    }
+    showAlert(res.error, "danger");
+  };
+
+  const setBlogCommentBe = async (id) => {
+    console.log("id comment ", id);
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/blog/setblogcomment", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+      body: JSON.stringify(id),
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.blogComments;
     } else {
       showAlert(res.error, "danger");
     }
@@ -307,6 +341,8 @@ function ContextBlog(props) {
         setLikebe,
         setDisLikebe,
         getFollowingBlog,
+        getBlogUserDetailsBe,
+        setBlogCommentBe,
       }}
     >
       {props.children}

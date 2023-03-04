@@ -115,7 +115,6 @@ router.put("/setblogcount", fetchuser, async (req, res) => {
     const count = {
       noOfPost: blogs.length,
     };
-
     const details = await UserDetails.findOneAndUpdate(
       { userid: req.userid },
       { noOfPost: blogs.length }
@@ -212,6 +211,15 @@ router.get("/getfollower", fetchuser, async (req, res) => {
       followerDetails: followerDetails,
       msg: "Get Follower",
     });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.put("/getbloguserdetails", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.body.id });
+    res.status(200).json({ success: true, details: details, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }

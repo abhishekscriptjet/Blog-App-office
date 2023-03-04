@@ -253,4 +253,40 @@ router.put("/setdislike", fetchuser, async (req, res) => {
   }
 });
 
+router.put("/setblogcomment", fetchuser, async (req, res) => {
+  try {
+    const blogID = req.body.id;
+
+    const blogs = await blog.find({ _id: blogID });
+    if (blog) {
+      const addComment = await blog.findOneAndUpdate(
+        { _id: blogID },
+        {
+          $push: {
+            comment: {
+              commentUser: req.userid,
+              text: req.body.text,
+              commentDate: new Date(),
+            },
+          },
+        },
+        { new: true }
+      );
+      const blogComments = await addComment.comment;
+      res.status(200).json({
+        success: true,
+        blogComments: blogComments,
+        msg: "Comment done",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        msg: "Blog not found",
+      });
+    }
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
 module.exports = router;
