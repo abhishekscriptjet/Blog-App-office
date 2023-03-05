@@ -304,10 +304,29 @@ function ContextBlog(props) {
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
-      return res.blogComments;
+      console.log("return :", res.comment);
+      return res.comment;
     } else {
       showAlert(res.error, "danger");
     }
+  };
+
+  const getCommentUserDetailsBe = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/user/getbloguserdetails",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.details;
+    }
+    showAlert(res.error, "danger");
   };
 
   const reset = () => {
@@ -343,6 +362,7 @@ function ContextBlog(props) {
         getFollowingBlog,
         getBlogUserDetailsBe,
         setBlogCommentBe,
+        getCommentUserDetailsBe,
       }}
     >
       {props.children}

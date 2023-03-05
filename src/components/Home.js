@@ -21,8 +21,8 @@ export default function Home() {
   const [alluser, setAlluser] = useState([]);
   const [userBlog, setUserBlog] = useState([]);
 
-  const saveToServer = () => {
-    loadBlog();
+  const saveToServer = async () => {
+    await loadData();
   };
 
   const resetEditClick = () => {
@@ -108,9 +108,9 @@ export default function Home() {
   };
 
   return (
-    <div className="d-flex">
+    <div className="d-flex mb-4">
       <div
-        className="my-5 ms-5 me-5 d-none d-sm-block shadow-lg p-4"
+        className="my-5 ms-5 me-2 d-none d-sm-block shadow-lg p-4"
         style={{
           borderRadius: "10px",
         }}
@@ -207,7 +207,7 @@ export default function Home() {
           : ""}
       </div>
       <div
-        className=" flex-grow-1 me-5 pb-2 shadow-lg   "
+        className=" flex-grow-1 mx-sm-5 pb-2 shadow-lg   "
         style={{
           marginTop: "30px",
           marginBottom: "30px",
@@ -248,7 +248,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="container d-flex flex-wrap flex-xxl-nowrap justify-content-center">
+        <div className="container d-flex flex-wrap flex-xl-row justify-content-center align-items-center ">
           {userBlog === []
             ? "Please create blog"
             : userBlog.map((blog) => {
@@ -261,6 +261,7 @@ export default function Home() {
                     <Blogcard
                       blog={blog}
                       user={user}
+                      saveToServer={saveToServer}
                       handleEditClick={handleEditClick}
                     />
                   </div>

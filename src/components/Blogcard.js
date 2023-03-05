@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import context from "../contextAPI/context";
 import UserIcon from "../sources/user.png";
+import CommentsSection from "./CommentsSection";
 
 export default function Blogcard(props) {
   const { topic, description, src, _id, upVote, downVote, userid, comment } =
@@ -26,6 +27,7 @@ export default function Blogcard(props) {
 
   const [commentText, setcommentText] = useState("");
   const [blogUserDetails, setBlogUserDetails] = useState([]);
+  const [commentDisplay, setCommentDisplay] = useState("none");
 
   const loadData = async () => {
     const blogUserID = {
@@ -106,23 +108,30 @@ export default function Blogcard(props) {
   };
 
   const handleDelete = async () => {
-    deleteEndPoint(_id);
+    await deleteEndPoint(_id);
+    await props.saveToServer();
   };
-
   const handleEdit = async () => {
     props.handleEditClick(props.blog);
   };
+
   const handleOnChangeComment = (e) => {
     const value = e.target.value;
     setcommentText(value);
   };
-
   const handleClickSendComment = async () => {
     const blogID = {
       id: _id,
       text: commentText,
     };
     setCommentsValue(await setBlogCommentBe(blogID));
+  };
+  const handleCommentDisplay = () => {
+    if (commentDisplay === "none") {
+      setCommentDisplay("block");
+    } else {
+      setCommentDisplay("none");
+    }
   };
 
   console.log("ccc::: ", comment);
@@ -214,7 +223,7 @@ export default function Blogcard(props) {
         </div>
         <hr className="my-0 mx-3" />
         <div className="mx-2">
-          <div className="input-group input-group-sm mb-3 mt-3 mx-2">
+          <div className="input-group input-group-sm mb-0 mt-3 mx-2">
             <span className="input-group-text" id="inputGroup-sizing-sm">
               Comment
             </span>
@@ -231,44 +240,26 @@ export default function Blogcard(props) {
               onClick={handleClickSendComment}
             ></i>
           </div>
+          <div className="d-flex justify-content-center align-items-center ">
+            <i
+              className="fa-solid fa-caret-down pb-2 btn "
+              onClick={handleCommentDisplay}
+            ></i>
+          </div>
         </div>
-        {!commentsValue
-          ? ""
-          : commentsValue.map((cmt) => {
+        {commentsValue.length === 0 ? (
+          <div className={`d-${commentDisplay} mb-3`}></div>
+        ) : (
+          <div className={`d-${commentDisplay} mb-3`}>
+            {commentsValue.map((cmt) => {
               return (
-                <div key={cmt._id} className=" mt-2">
-                  <div>
-                    <div className="d-flex justify-content-left align-items-center mx-3 my-1">
-                      <img
-                        src={
-                          blogUserDetails.length > 0
-                            ? blogUserDetails[0].profileImg
-                              ? blogUserDetails[0].profileImg
-                              : UserIcon
-                            : UserIcon
-                        }
-                        className="rounded-circle  border border-secondary"
-                        alt=""
-                        width="25"
-                      />
-                      <p
-                        className="text-muted ps-2 m-0"
-                        style={{ fontSize: "15px" }}
-                      >
-                        {blogUserDetails.length > 0
-                          ? blogUserDetails[0].user.name
-                          : ""}
-                      </p>
-                    </div>
-                    <div className="d-flex flex-column">
-                      <p className="text-muted p-2 m-0 ms-5 border border-dark rounded bg-white">
-                        {cmt.text}
-                      </p>
-                    </div>
-                  </div>
+                <div key={cmt.commentUser} className=" mt-2">
+                  <CommentsSection cmt={cmt} />
                 </div>
               );
             })}
+          </div>
+        )}
       </div>
     </div>
   );

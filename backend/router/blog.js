@@ -1,9 +1,10 @@
 const express = require("express");
 const blog = require("../schema/blog");
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, Result } = require("express-validator");
 const fetchuser = require("./fetchUser");
 const User = require("../schema/user");
 const UserDetails = require("../schema/userDetails");
+const { get } = require("mongoose");
 const router = express.Router();
 
 router.post(
@@ -18,14 +19,14 @@ router.post(
     try {
       const userId = await req.userid;
       const user = await User.findById(userId).select("-password");
-      const { topic, description, comment, upVote, downVote, src } = req.body;
+      const { topic, description, upVote, downVote, src } = req.body;
       if (user) {
         const blogs = new blog({
           userid: userId,
           topic: topic,
           description: description,
           src: src,
-          comment: comment,
+          comment: [],
           upVote: [],
           downVote: [],
         });
@@ -37,6 +38,7 @@ router.post(
           .json({ success: false, error: "Not allowed to create blog" });
       }
     } catch (error) {
+      console.log("error ", error);
       res.status(400).json({ success: false, error: "Internal server error" });
     }
   }
@@ -255,36 +257,73 @@ router.put("/setdislike", fetchuser, async (req, res) => {
 
 router.put("/setblogcomment", fetchuser, async (req, res) => {
   try {
+    const userId = req.userid;
     const blogID = req.body.id;
-
-    const blogs = await blog.find({ _id: blogID });
+    const blogs = await blog.findOne({ _id: blogID });
     if (blog) {
-      const addComment = await blog.findOneAndUpdate(
-        { _id: blogID },
-        {
+      const find = await blog.findOne({
+        _id: blogID,
+        "comment.commentUser": userId,
+      });
+      // console.log("user Result ", find);
+      if (!find) {
+        const addCommentUser = await blog.findOneAndUpdate(
+          {
+            _id: blogID,
+          },
+          {
+            $push: {
+              comment: {
+                commentUser: userId,
+                data: [{ text: req.body.text, commentDate: new Date() }],
+              },
+            },
+          },
+          { new: true }
+        );
+        const comment = addCommentUser.comment;
+        res.status(200).json({
+          success: true,
+          comment: comment,
+          msg: "Comment done",
+        });
+        // console.log("result ", comment);
+      } else {
+        const query = { _id: blogID };
+        const updateDocument = {
           $push: {
-            comment: {
-              commentUser: req.userid,
+            "comment.$[user].data": {
               text: req.body.text,
               commentDate: new Date(),
             },
           },
-        },
-        { new: true }
-      );
-      const blogComments = await addComment.comment;
-      res.status(200).json({
-        success: true,
-        blogComments: blogComments,
-        msg: "Comment done",
-      });
+        };
+        const options = {
+          arrayFilters: [
+            {
+              "user.commentUser": userId,
+            },
+          ],
+          new: true,
+        };
+        const result = await blog.updateOne(query, updateDocument, options);
+        const getBlog = await blog.findOne({ _id: blogID });
+        const comment = getBlog.comment;
+        res.status(200).json({
+          success: true,
+          comment: comment,
+          msg: "user found in blog",
+        });
+        // console.log("Result ", comment);
+      }
     } else {
       res.status(400).json({
         success: false,
-        msg: "Blog not found",
+        error: "Blog not found",
       });
     }
   } catch (error) {
+    console.log("Error ", error);
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });

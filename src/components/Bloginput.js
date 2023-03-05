@@ -89,6 +89,7 @@ export default function Bloginput(props) {
       await resetEditClick();
       setBlog({ topic: "", description: "", src: "" });
     }
+    props.saveToServer();
   };
 
   const handleCrossIcon = async () => {
