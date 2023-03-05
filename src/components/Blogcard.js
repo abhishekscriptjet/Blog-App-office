@@ -134,8 +134,6 @@ export default function Blogcard(props) {
     }
   };
 
-  console.log("ccc::: ", comment);
-
   return (
     <div
       className="card"

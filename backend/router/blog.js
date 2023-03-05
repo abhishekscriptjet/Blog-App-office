@@ -4,7 +4,6 @@ const { body, validationResult, Result } = require("express-validator");
 const fetchuser = require("./fetchUser");
 const User = require("../schema/user");
 const UserDetails = require("../schema/userDetails");
-const { get } = require("mongoose");
 const router = express.Router();
 
 router.post(
@@ -324,6 +323,21 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
     }
   } catch (error) {
     console.log("Error ", error);
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.post("/getclickuserblog", fetchuser, async (req, res) => {
+  try {
+    const ClickUserBlog = await blog.find({
+      userid: req.body.id,
+    });
+    res.status(200).json({
+      success: true,
+      ClickUserBlog: ClickUserBlog,
+      msg: "Get User Blog",
+    });
+  } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });

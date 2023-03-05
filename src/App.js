@@ -8,6 +8,7 @@ import Profile from "./components/Profile";
 import Footer from "./components/Footer";
 import Alert from "./components/Alert";
 import Userdetails from "./components/Userdetails";
+import OtherProfile from "./components/OtherProfile";
 import ContextBlog from "./contextAPI/ContextBlog";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/profile" element={<Profile />} />
               <Route exact path="/userdetails" element={<Userdetails />} />
+              <Route exact path="/clickuser" element={<OtherProfile />} />
               <Route exact path="/login" element={<Login />} />
               <Route exact path="/signup" element={<Signup />} />
             </Routes>

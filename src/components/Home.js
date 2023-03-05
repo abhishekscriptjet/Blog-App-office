@@ -16,6 +16,7 @@ export default function Home() {
     setBlogCount,
     setFollowing,
     getFollowingBlog,
+    setClickUserDetails,
   } = contextBlog;
   const [editClick, setEditClick] = useState(false);
   const [alluser, setAlluser] = useState([]);
@@ -107,6 +108,11 @@ export default function Home() {
     setAlluser(allUser);
   };
 
+  const handleClickOtherUser = async (data) => {
+    await setClickUserDetails(data);
+    navigate("./clickuser");
+  };
+
   return (
     <div className="d-flex mb-4">
       <div
@@ -151,8 +157,11 @@ export default function Home() {
                           />
                         </div>
                         <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
-                          <div className="text-center ">
-                            <h6 className="mb-1 ">{alluser.user.name}</h6>
+                          <div
+                            className="text-center"
+                            onClick={() => handleClickOtherUser(alluser)}
+                          >
+                            <h6 className="mb-1">{alluser.user.name}</h6>
                             <p
                               className="mb-1 pb-1"
                               style={{ color: "#2b2a2a", fontSize: "0.8em" }}

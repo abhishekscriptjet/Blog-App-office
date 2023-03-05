@@ -7,6 +7,7 @@ function ContextBlog(props) {
   const [user, setUser] = useState({});
   const [alluser, setAllUser] = useState([]);
   const [userDetails, setUserDetails] = useState([]);
+  const [clickUser, setClickUser] = useState({});
 
   const showAlert = (massage, type) => {
     setAlert({
@@ -228,7 +229,6 @@ function ContextBlog(props) {
   };
 
   const setLikebe = async (id) => {
-    console.log("id ", id);
     const user = localStorage.getItem("blogToken");
     const response = await fetch("http://localhost:5000/blog/setlike", {
       method: "PUT",
@@ -294,7 +294,6 @@ function ContextBlog(props) {
   };
 
   const setBlogCommentBe = async (id) => {
-    console.log("id comment ", id);
     const user = localStorage.getItem("blogToken");
     const response = await fetch("http://localhost:5000/blog/setblogcomment", {
       method: "PUT",
@@ -304,7 +303,6 @@ function ContextBlog(props) {
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
-      console.log("return :", res.comment);
       return res.comment;
     } else {
       showAlert(res.error, "danger");
@@ -329,6 +327,34 @@ function ContextBlog(props) {
     showAlert(res.error, "danger");
   };
 
+  const setClickUserDetails = (data) => {
+    if (data._id) {
+      setClickUser(data);
+      showAlert("Getting data", "success");
+    } else {
+      showAlert("There is same Error to loadding", "danger");
+    }
+  };
+
+  const getClickUserBlog = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/blog/getclickuserblog",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.ClickUserBlog;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -344,6 +370,7 @@ function ContextBlog(props) {
         user,
         alluser,
         userDetails,
+        clickUser,
         deleteEndPoint,
         createBlog,
         loadBlog,
@@ -363,6 +390,8 @@ function ContextBlog(props) {
         getBlogUserDetailsBe,
         setBlogCommentBe,
         getCommentUserDetailsBe,
+        setClickUserDetails,
+        getClickUserBlog,
       }}
     >
       {props.children}
