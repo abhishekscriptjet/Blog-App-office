@@ -19,15 +19,14 @@ function ContextBlog(props) {
     }, 3000);
   };
 
-  const loadBlog = async () => {
+  const getUser = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/getblog", {
+    const response = await fetch("http://localhost:5000/blog/getuser", {
       method: "GET",
       headers: { "Content-Type": "application/json", "auth-token": user },
     });
     const res = await response.json();
     if (res.success) {
-      setUserBlog(res.getblog);
       setUser(res.user);
       showAlert(res.msg, "success");
     } else {
@@ -35,7 +34,22 @@ function ContextBlog(props) {
     }
   };
 
-  const loadUser = async () => {
+  const getUserBlogs = async () => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch("http://localhost:5000/blog/getuserblogs", {
+      method: "GET",
+      headers: { "Content-Type": "application/json", "auth-token": user },
+    });
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.blogs;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const loadAllUser = async () => {
     const user = localStorage.getItem("blogToken");
     const response = await fetch("http://localhost:5000/user/getalluser", {
       method: "GET",
@@ -155,37 +169,9 @@ function ContextBlog(props) {
     return false;
   };
 
-  const setBlogCount = async () => {
-    const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/setblogcount", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
-    const res = await response.json();
-    if (res.success) {
-    } else {
-      showAlert(res.error, "danger");
-    }
-  };
-
   const setFollowing = async (id) => {
     const user = localStorage.getItem("blogToken");
     const response = await fetch("http://localhost:5000/user/setfollowing", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(id),
-    });
-    const res = await response.json();
-    if (res.success) {
-      showAlert(res.msg, "success");
-    } else {
-      showAlert(res.error, "danger");
-    }
-  };
-
-  const setUnfollow = async (id) => {
-    const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/setunfollow", {
       method: "PUT",
       headers: { "Content-Type": "application/json", "auth-token": user },
       body: JSON.stringify(id),
@@ -327,9 +313,10 @@ function ContextBlog(props) {
     showAlert(res.error, "danger");
   };
 
-  const setClickUserDetails = (data) => {
+  const setClickUserDetails = (data, user) => {
     if (data._id) {
       setClickUser(data);
+      setUser(user);
       showAlert("Getting data", "success");
     } else {
       showAlert("There is same Error to loadding", "danger");
@@ -355,6 +342,44 @@ function ContextBlog(props) {
     }
   };
 
+  const getClickFollowingBe = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/user/getclickfollowing",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.followingDetails;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const getClickFollowerBe = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      "http://localhost:5000/user/getclickfollower",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      showAlert(res.msg, "success");
+      return res.followerDetails;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -372,15 +397,15 @@ function ContextBlog(props) {
         userDetails,
         clickUser,
         deleteEndPoint,
+        getUserBlogs,
         createBlog,
-        loadBlog,
+        getUser,
         showAlert,
         editBlog,
         createUserDetails,
         getUserDetails,
-        loadUser,
+        loadAllUser,
         reset,
-        setBlogCount,
         setFollowing,
         getFollowing,
         getFollower,
@@ -392,6 +417,8 @@ function ContextBlog(props) {
         getCommentUserDetailsBe,
         setClickUserDetails,
         getClickUserBlog,
+        getClickFollowerBe,
+        getClickFollowingBe,
       }}
     >
       {props.children}

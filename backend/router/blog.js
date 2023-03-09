@@ -18,7 +18,8 @@ router.post(
     try {
       const userId = await req.userid;
       const user = await User.findById(userId).select("-password");
-      const { topic, description, upVote, downVote, src } = req.body;
+      const { topic, description, src } = req.body;
+      // Create Blog
       if (user) {
         const blogs = new blog({
           userid: userId,
@@ -30,6 +31,12 @@ router.post(
           downVote: [],
         });
         const creatBlog = await blogs.save();
+        // Add Blog count in userDetails
+        const allblogs = await blog.find({ userid: req.userid });
+        const details = await UserDetails.findOneAndUpdate(
+          { userid: req.userid },
+          { noOfPost: allblogs.length }
+        );
         await res.status(200).json({ success: true, creatBlog: creatBlog });
       } else {
         res
@@ -43,11 +50,19 @@ router.post(
   }
 );
 
-router.get("/getblog", fetchuser, async (req, res) => {
+router.get("/getuser", fetchuser, async (req, res) => {
   try {
-    const getblog = await blog.find({ userid: req.userid });
     const user = await User.findById(req.userid).select("-password");
-    res.status(200).json({ success: true, getblog, user, msg: "Loaded" });
+    res.status(200).json({ success: true, user, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.get("/getuserblogs", fetchuser, async (req, res) => {
+  try {
+    const blogs = await blog.find({ userid: req.userid });
+    res.status(200).json({ success: true, blogs, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
@@ -80,6 +95,14 @@ router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
       return res.status(400).json({ success: false, error: "Not Allowed" });
     }
     const deleteblog = await blog.findByIdAndRemove(req.params.id);
+
+    // Update Blog count in userDetails
+    const allblogs = await blog.find({ userid: req.userid });
+    const details = await UserDetails.findOneAndUpdate(
+      { userid: req.userid },
+      { noOfPost: allblogs.length }
+    );
+
     res.status(200).json({ success: true, deleteblog: deleteblog });
   } catch (error) {
     return res

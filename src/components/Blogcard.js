@@ -252,7 +252,7 @@ export default function Blogcard(props) {
             {commentsValue.map((cmt) => {
               return (
                 <div key={cmt.commentUser} className=" mt-2">
-                  <CommentsSection cmt={cmt} />
+                  <CommentsSection cmt={cmt} commentDisplay={commentDisplay} />
                 </div>
               );
             })}

@@ -9,36 +9,42 @@ export default function Profile() {
   const clickFollowingRef = useRef(null);
   const contextBlog = useContext(context);
   const {
-    getFollowing,
-    getFollower,
+    user,
     setFollowing,
     getClickUserBlog,
+    getClickFollowerBe,
+    getClickFollowingBe,
     clickUser,
   } = contextBlog;
+  const [clickUserDetails, setClickUserDetails] = useState({});
   const [clickUserBlog, setClickUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
 
-  console.log("Click User :", clickUser);
+  // console.log("Click User :", clickUser);
 
   const loadData = async () => {
     const id = {
       id: clickUser.userid,
     };
+    setClickUserDetails(clickUser);
     setClickUserBlog(await getClickUserBlog(id));
   };
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
+      if (!clickUser.userid) {
+        navigate("../");
+      }
       loadData();
     } else {
-      navigate("./login");
+      navigate("../login");
     }
     //eslint-disable-next-line
   }, []);
 
   const handleClose = () => {
-    getUserDetails();
+    setFollow([]);
   };
 
   const capitaliz = (string) => {
@@ -50,25 +56,30 @@ export default function Profile() {
     }
   };
 
-  const handleEditProfile = () => {};
+  const handleClickFollow = () => {};
 
   const handleFollowing = async (e) => {
     const btn = e.target.value;
+    const id = {
+      id: clickUser.userid,
+    };
     if (btn === "following") {
       setModelName("Following");
-      setFollow(await getFollowing());
+      setFollow(await getClickFollowingBe(id));
       clickFollowingRef.current.click();
     } else if (btn === "follower") {
       setModelName("Follower");
-      setFollow(await getFollower());
+      setFollow(await getClickFollowerBe(id));
       clickFollowingRef.current.click();
     }
   };
+
   const handleFollow = async (id) => {
+    console.log("id ", id);
     let userid = { id: id };
     setFollowing(userid);
 
-    let allUser = follow;
+    let allUser = follow.length > 0 ? follow : [clickUserDetails];
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
       if (element.userid === id) {
@@ -115,6 +126,13 @@ export default function Profile() {
           allUser[index] = updateduser;
         }
         break;
+      }
+    }
+    if (allUser.length <= 1) {
+      console.log("user ", allUser);
+      if (allUser[0].userid === clickUserDetails.userid) {
+        console.log("user match ", allUser);
+        setClickUserDetails({ ...allUser[0] });
       }
     }
     setFollow(allUser);
@@ -202,7 +220,11 @@ export default function Profile() {
                     style={{ width: "150px" }}
                   >
                     <img
-                      src={clickUser ? clickUser.profileImg : UserIcon}
+                      src={
+                        clickUserDetails
+                          ? clickUserDetails.profileImg
+                          : UserIcon
+                      }
                       alt="Generic placeholder"
                       className="img-fluid img-thumbnail mt-2 mt-sm-4 mb-2"
                       style={{
@@ -214,27 +236,31 @@ export default function Profile() {
                     />
                     <button
                       type="button"
-                      className="btn btn-secondary  btn-outline-light"
+                      className="btn btn-primary"
                       data-mdb-ripple-color="dark"
                       style={{ zIndex: "1" }}
-                      onClick={handleEditProfile}
+                      onClick={() => handleFollow(clickUserDetails.userid)}
                     >
-                      Follow
+                      {clickUserDetails.follower
+                        ? clickUserDetails.follower.includes(user._id)
+                          ? "Following"
+                          : "Follow"
+                        : ""}
                     </button>
                   </div>
                   <div className="ms-3" style={{ marginTop: "110px" }}>
                     <h5>
-                      {clickUser
-                        ? `${capitaliz(clickUser.firstName)} ${capitaliz(
-                            clickUser.lastName
+                      {clickUserDetails
+                        ? `${capitaliz(clickUserDetails.firstName)} ${capitaliz(
+                            clickUserDetails.lastName
                           )}`
                         : ""}
                     </h5>
                     <p className="">
-                      {clickUser
-                        ? `${capitaliz(clickUser.city)}, ${capitaliz(
-                            clickUser.state
-                          )}, ${capitaliz(clickUser.country)}.`
+                      {clickUserDetails
+                        ? `${capitaliz(clickUserDetails.city)}, ${capitaliz(
+                            clickUserDetails.state
+                          )}, ${capitaliz(clickUserDetails.country)}.`
                         : ""}
                     </p>
                   </div>
@@ -252,7 +278,9 @@ export default function Profile() {
                     </div>
                     <div className="text-center  mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {clickUser ? clickUser.follower.length : "0"}
+                        {clickUserDetails.follower
+                          ? clickUserDetails.follower.length
+                          : "0"}
                       </p>
                       <button
                         className="small text-muted mb-0 btn"
@@ -264,7 +292,9 @@ export default function Profile() {
                     </div>
                     <div className="text-center  mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {clickUser ? clickUser.following.length : "0"}
+                        {clickUserDetails.following
+                          ? clickUserDetails.following.length
+                          : "0"}
                       </p>
                       <button
                         className="small text-muted mb-0 btn"
@@ -287,18 +317,25 @@ export default function Profile() {
                       style={{ backgroundColor: "rgb(229 230 231)" }}
                     >
                       <p className="font-italic mb-1">
-                        {clickUser ? clickUser.profession : ""}
+                        {clickUserDetails ? clickUserDetails.profession : ""}
                       </p>
                       <p className="font-italic mb-1">
-                        Lives in {clickUser ? capitaliz(clickUser.country) : ""}
+                        Lives in{" "}
+                        {clickUserDetails
+                          ? capitaliz(clickUserDetails.country)
+                          : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Gender </strong>
-                        {clickUser ? capitaliz(clickUser.gender) : ""}
+                        {clickUserDetails
+                          ? capitaliz(clickUserDetails.gender)
+                          : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Birth Date </strong>
-                        {clickUser ? capitaliz(clickUser.dateOfBirth) : ""}
+                        {clickUserDetails
+                          ? capitaliz(clickUserDetails.dateOfBirth)
+                          : ""}
                       </p>
                     </div>
                   </div>

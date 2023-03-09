@@ -3,20 +3,20 @@ import Blogcard from "./Blogcard";
 import Bloginput from "./Bloginput";
 import context from "../contextAPI/context";
 import { useNavigate } from "react-router-dom";
-import UserIcon from "../sources/user.png";
+import UserDisplay from "./UserDisplay";
 
 export default function Home() {
   const clickEdit = useRef(null);
   const navigate = useNavigate();
   const contextBlog = useContext(context);
   const {
-    loadBlog,
+    getUser,
     user,
-    loadUser,
-    setBlogCount,
+    loadAllUser,
     setFollowing,
     getFollowingBlog,
     setClickUserDetails,
+    getUserDetails,
   } = contextBlog;
   const [editClick, setEditClick] = useState(false);
   const [alluser, setAlluser] = useState([]);
@@ -31,15 +31,15 @@ export default function Home() {
   };
 
   const loadData = async () => {
-    setAlluser(await loadUser());
+    await getUserDetails();
+    setAlluser(await loadAllUser());
     setUserBlog(await getFollowingBlog());
   };
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
-      loadBlog();
+      getUser();
       loadData();
-      setBlogCount();
     } else {
       navigate("./login");
     }
@@ -54,6 +54,8 @@ export default function Home() {
   const handleFollow = async (id) => {
     let userid = { id: id };
     setFollowing(userid);
+    setUserBlog(await getFollowingBlog());
+    setUserBlog(await getFollowingBlog());
 
     let allUser = alluser;
     for (let index = 0; index < allUser.length; index++) {
@@ -104,13 +106,30 @@ export default function Home() {
         break;
       }
     }
-
     setAlluser(allUser);
   };
 
   const handleClickOtherUser = async (data) => {
-    await setClickUserDetails(data);
+    await setClickUserDetails(data, user);
     navigate("./clickuser");
+  };
+
+  const topicFilter = async (topic) => {
+    const blog = await getFollowingBlog();
+    if (topic === "sports") {
+      const blogFilter = blog.filter((b) => b.topic === "sports");
+      setUserBlog(blogFilter);
+    } else if (topic === "science") {
+      const blogFilter = blog.filter((b) => b.topic === "science");
+      setUserBlog(blogFilter);
+    } else if (topic === "teaching") {
+      const blogFilter = blog.filter((b) => b.topic === "teaching");
+      setUserBlog(blogFilter);
+    } else if (topic === "all") {
+      setUserBlog(blog);
+    } else {
+      setUserBlog(blog);
+    }
   };
 
   return (
@@ -129,101 +148,76 @@ export default function Home() {
               })
               .map((alluser) => {
                 return (
-                  <div
-                    className="card d-flex justify-content-center align-items-center my-3"
-                    style={{
-                      borderRadius: "15px",
-                      width: "22vw",
-                      backgroundColor: "inherit",
-                    }}
-                    key={alluser._id}
-                  >
-                    <div className="card-body p-2 ">
-                      <div className="d-flex  flex-column flex-xxl-row text-black  ">
-                        <div className="d-flex justify-content-evenly align-items-center">
-                          <img
-                            src={
-                              alluser.profileImg ? alluser.profileImg : UserIcon
-                            }
-                            alt="Generic placeholder"
-                            className="img-fluid "
-                            style={{
-                              width: "80%",
-                              height: "80%",
-                              minWidth: "50px",
-                              minHeight: "50px",
-                              borderRadius: "10px",
-                            }}
-                          />
-                        </div>
-                        <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
-                          <div
-                            className="text-center"
-                            onClick={() => handleClickOtherUser(alluser)}
-                          >
-                            <h6 className="mb-1">{alluser.user.name}</h6>
-                            <p
-                              className="mb-1 pb-1"
-                              style={{ color: "#2b2a2a", fontSize: "0.8em" }}
-                            >
-                              {alluser.profession}
-                            </p>
-                          </div>
-                          <div
-                            className=" rounded-3 py-1 px-2 mb-2"
-                            style={{ backgroundColor: "#efefef" }}
-                          >
-                            <div className="d-flex justify-content-center text-center">
-                              <div>
-                                <p className="small text-muted mb-1">Post</p>
-                                <p className="mb-0">{alluser.noOfPost}</p>
-                              </div>
-                              <div className="px-3">
-                                <p className="small text-muted mb-1">
-                                  Followers
-                                </p>
-                                <p className="mb-0">
-                                  {alluser.follower.length}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="small text-muted mb-1">
-                                  Following
-                                </p>
-                                <p className="mb-0">
-                                  {alluser.following.length}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="d-flex pt-1">
-                              <button
-                                type="button"
-                                className="btn btn-primary flex-grow-1 "
-                                onClick={() => handleFollow(alluser.userid)}
-                              >
-                                {alluser.follower.includes(user._id)
-                                  ? "Following"
-                                  : "Follow"}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div key={alluser._id}>
+                    <UserDisplay
+                      alluser={alluser}
+                      user={user}
+                      handleClickOtherUser={handleClickOtherUser}
+                      handleFollow={handleFollow}
+                    />
                   </div>
                 );
               })
           : ""}
       </div>
       <div
-        className=" flex-grow-1 mx-sm-5 pb-2 shadow-lg   "
+        className="flex-grow-1 mx-sm-5 pb-2 shadow-lg"
         style={{
           marginTop: "30px",
           marginBottom: "30px",
           borderRadius: "10px",
         }}
       >
-        <div className="text-center">
+        <div className="d-flex text-center justify-content-center align-items-center">
+          <div className="dropdown mt-4 me-3 py-2">
+            <button
+              className="btn btn-secondary dropdown-toggle fw-bold"
+              type="button"
+              id="dropdownMenuButton1"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Topic
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li>
+                <div
+                  className="dropdown-item"
+                  value="all"
+                  onClick={() => topicFilter("all")}
+                >
+                  All
+                </div>
+              </li>
+              <li>
+                <div
+                  className="dropdown-item"
+                  value="sports"
+                  onClick={() => topicFilter("sports")}
+                >
+                  Sports
+                </div>
+              </li>
+              <li>
+                <div
+                  className="dropdown-item"
+                  value="science"
+                  onClick={() => topicFilter("science")}
+                >
+                  Science
+                </div>
+              </li>
+              <li>
+                <div
+                  className="dropdown-item"
+                  value="teaching"
+                  onClick={() => topicFilter("teaching")}
+                >
+                  Teaching
+                </div>
+              </li>
+            </ul>
+          </div>
           {/* <!-- Button trigger modal --> */}
           <button
             ref={clickEdit}

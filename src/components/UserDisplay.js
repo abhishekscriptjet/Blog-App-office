@@ -1,7 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import UserIcon from "../sources/user.png";
+import context from "../contextAPI/context";
 export default function UserDisplay(props) {
-  const { alluser, user, handleFollow } = props;
+  const { alluser, handleClickOtherUser, user, handleFollow } = props;
+  const contextBlog = useContext(context);
+  const {} = contextBlog;
 
   return (
     <div>
@@ -31,7 +34,11 @@ export default function UserDisplay(props) {
               />
             </div>
             <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
-              <div className="text-center ">
+              <div
+                className="text-center "
+                style={{ cursor: "pointer" }}
+                onClick={() => handleClickOtherUser(alluser)}
+              >
                 <h6 className="mb-1 ">{alluser.user.name}</h6>
                 <p
                   className="mb-1 pb-1"
@@ -65,6 +72,7 @@ export default function UserDisplay(props) {
                   <button
                     type="button"
                     className="btn btn-primary flex-grow-1 "
+                    disabled={alluser.userid === user._id}
                     onClick={() => handleFollow(alluser.userid)}
                   >
                     {alluser.follower.includes(user._id)

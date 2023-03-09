@@ -13,12 +13,15 @@ export default function CommentsSection(props) {
     const commentUserID = {
       id: commentUser,
     };
-    setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
+    if (props.commentDisplay === "block") {
+      setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
+      console.log("ese");
+    }
   };
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [props.commentDisplay]);
 
   return (
     <div>

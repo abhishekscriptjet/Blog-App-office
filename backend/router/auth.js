@@ -49,7 +49,7 @@ router.post(
         res.status(400).json({ success: false, error: "User alredy exist" });
       }
     } catch (error) {
-      res.status(400).json({ success: false});
+      res.status(400).json({ success: false });
     }
   }
 );
@@ -65,7 +65,9 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array(),error:"Set valid data" });
+      return res
+        .status(400)
+        .json({ errors: errors.array(), error: "Set valid data" });
     }
     try {
       const { email, password } = req.body;
@@ -79,14 +81,10 @@ router.post(
         const token = jwt.sign(body, signature);
         res.status(200).json({ success: true, token: token });
       } else {
-        res
-          .status(400)
-          .json({ success: false });
+        res.status(400).json({ success: false });
       }
     } catch (error) {
-      res
-        .status(400)
-        .json({ success: false });
+      res.status(400).json({ success: false });
     }
   }
 );

@@ -109,22 +109,6 @@ router.get("/getalluser", async (req, res) => {
   }
 });
 
-router.put("/setblogcount", fetchuser, async (req, res) => {
-  try {
-    const blogs = await blog.find({ userid: req.userid });
-    const count = {
-      noOfPost: blogs.length,
-    };
-    const details = await UserDetails.findOneAndUpdate(
-      { userid: req.userid },
-      { noOfPost: blogs.length }
-    );
-    res.status(200).json({ success: true, count: blogs.length, msg: "Loaded" });
-  } catch (error) {
-    res.status(400).json({ success: false, error: "Internel server error" });
-  }
-});
-
 router.put("/setfollowing", fetchuser, async (req, res) => {
   try {
     const followingID = req.body.id;
@@ -166,26 +150,6 @@ router.put("/setfollowing", fetchuser, async (req, res) => {
   }
 });
 
-router.put("/setunfollow", fetchuser, async (req, res) => {
-  try {
-    const unFollowId = req.body.id;
-    const details = await UserDetails.findOneAndUpdate(
-      { userid: req.userid },
-      { $pull: { following: unFollowId } }
-    );
-    const addFollower = await UserDetails.findOneAndUpdate(
-      { userid: unFollowId },
-      { $pull: { follower: req.userid } }
-    );
-    res.status(200).json({
-      success: true,
-      msg: "Unfollow done",
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: "Internel server error" });
-  }
-});
-
 router.get("/getfollowing", fetchuser, async (req, res) => {
   try {
     const details = await UserDetails.find({ userid: req.userid });
@@ -220,6 +184,36 @@ router.put("/getbloguserdetails", fetchuser, async (req, res) => {
   try {
     const details = await UserDetails.find({ userid: req.body.id });
     res.status(200).json({ success: true, details: details, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.post("/getclickfollowing", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.body.id });
+    const following = details[0].following;
+    const followingDetails = await UserDetails.find({ userid: following });
+    res.status(200).json({
+      success: true,
+      followingDetails: followingDetails,
+      msg: "Get Following",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.post("/getclickfollower", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.body.id });
+    const follower = details[0].follower;
+    const followerDetails = await UserDetails.find({ userid: follower });
+    res.status(200).json({
+      success: true,
+      followerDetails: followerDetails,
+      msg: "Get Follower",
+    });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }

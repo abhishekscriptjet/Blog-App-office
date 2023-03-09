@@ -9,25 +9,29 @@ export default function Profile() {
   const clickFollowingRef = useRef(null);
   const contextBlog = useContext(context);
   const {
-    loadBlog,
-    userBlog,
+    getUser,
+    getUserBlogs,
     user,
     getUserDetails,
     userDetails,
-    loadUser,
     getFollowing,
     getFollower,
     setFollowing,
   } = contextBlog;
 
+  const [userBlog, setUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
 
+  const loadData = async () => {
+    await getUser();
+    setUserBlog(await getUserBlogs());
+    await getUserDetails();
+  };
+
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
-      loadBlog();
-      loadUser();
-      getUserDetails();
+      loadData();
     } else {
       navigate("./login");
     }
@@ -241,13 +245,13 @@ export default function Profile() {
                   style={{ backgroundColor: "rgb(229 230 231)" }}
                 >
                   <div className="d-flex justify-content-end justify-content-sm-end flex-column flex-sm-row text-center py-0 px-5 ">
-                    <div className="text-center  mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
+                    <div className="text-center mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
                         {userBlog.length > 0 ? userBlog.length : 0}
                       </p>
                       <p className="small text-muted mb-0 btn curser">Photos</p>
                     </div>
-                    <div className="text-center  mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
+                    <div className="text-center mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
                         {userDetails.length > 0
                           ? userDetails[0].follower.length
