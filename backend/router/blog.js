@@ -282,12 +282,11 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
     const userId = req.userid;
     const blogID = req.body.id;
     const blogs = await blog.findOne({ _id: blogID });
-    if (blog) {
+    if (blogs) {
       const find = await blog.findOne({
         _id: blogID,
         "comment.commentUser": userId,
       });
-      // console.log("user Result ", find);
       if (!find) {
         const addCommentUser = await blog.findOneAndUpdate(
           {
@@ -309,7 +308,6 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
           comment: comment,
           msg: "Comment done",
         });
-        // console.log("result ", comment);
       } else {
         const query = { _id: blogID };
         const updateDocument = {
@@ -336,7 +334,58 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
           comment: comment,
           msg: "user found in blog",
         });
-        // console.log("Result ", comment);
+      }
+    } else {
+      res.status(400).json({
+        success: false,
+        error: "Blog not found",
+      });
+    }
+  } catch (error) {
+    console.log("Error ", error);
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.put("/deleteblogcomment", fetchuser, async (req, res) => {
+  try {
+    const userId = req.userid;
+    const blogID = req.body.blogId;
+    const blogs = await blog.findOne({ _id: blogID });
+    if (blogs) {
+      const query = { _id: blogID };
+      const updateDocument = {
+        $pull: {
+          "comment.$[user].data": {
+            text: req.body.text,
+            commentDate: req.body.date,
+          },
+        },
+      };
+      const options = {
+        arrayFilters: [
+          {
+            "user.commentUser": userId,
+          },
+        ],
+        new: true,
+      };
+      const result = await blog.updateOne(query, updateDocument, options);
+      const getBlog = await blog.findOne({ _id: blogID });
+      const comment = getBlog.comment;
+      if (result.modifiedCount === 0) {
+        res.status(400).json({
+          success: false,
+          comment: comment,
+          error: "Not allowed",
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          comment: comment,
+          msg: "Comment Deleted",
+        });
+        // console.log("result ", result);
       }
     } else {
       res.status(400).json({
@@ -359,6 +408,26 @@ router.post("/getclickuserblog", fetchuser, async (req, res) => {
       success: true,
       ClickUserBlog: ClickUserBlog,
       msg: "Get User Blog",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
+router.post("/getfollowingfilterblog", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({
+      userid: req.userid,
+    });
+    const following = details[0].following;
+    const followingFilterBlog = await blog.find({
+      userid: [...following, req.userid],
+      topic: req.body.topic,
+    });
+    res.status(200).json({
+      success: true,
+      followingFilterBlog: followingFilterBlog,
+      msg: "Get Following Blog",
     });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });

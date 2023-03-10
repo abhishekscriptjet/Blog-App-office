@@ -40,7 +40,6 @@ export default function Login() {
       localStorage.setItem("blogToken", token);
       showAlert("Login Successfully.", "success");
       const oldUser = await getUserDetails();
-      console.log(oldUser);
       if (oldUser) {
         navigate("/");
       } else {

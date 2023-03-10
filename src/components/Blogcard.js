@@ -8,11 +8,13 @@ export default function Blogcard(props) {
     props.blog;
   const alertContext = useContext(context);
   const {
+    showAlert,
     deleteEndPoint,
     setLikebe,
     setDisLikebe,
     getBlogUserDetailsBe,
     setBlogCommentBe,
+    deleteBlogCommentBe,
   } = alertContext;
   const user = props.user;
 
@@ -119,13 +121,24 @@ export default function Blogcard(props) {
     const value = e.target.value;
     setcommentText(value);
   };
+
   const handleClickSendComment = async () => {
     const blogID = {
       id: _id,
       text: commentText,
     };
-    setCommentsValue(await setBlogCommentBe(blogID));
+    if (commentText !== "") {
+      setCommentsValue(await setBlogCommentBe(blogID));
+    } else {
+      showAlert("Can not send without comment", "danger");
+    }
+    setcommentText("");
   };
+
+  const handleDeleteComment = async (id) => {
+    setCommentsValue(await deleteBlogCommentBe({ ...id, blogId: _id }));
+  };
+
   const handleCommentDisplay = () => {
     if (commentDisplay === "none") {
       setCommentDisplay("block");
@@ -155,6 +168,13 @@ export default function Blogcard(props) {
           className="rounded-circle"
           alt=""
           width="25"
+          style={{
+            height: "30px",
+            width: "30px",
+            maxHeight: "30px",
+            maxWidth: "30px",
+            objectFit: "cover",
+          }}
         />
         <p className="text-muted p-2 m-0 ms-2">
           {blogUserDetails.length > 0 ? blogUserDetails[0].user.name : ""}
@@ -225,19 +245,43 @@ export default function Blogcard(props) {
             <span className="input-group-text" id="inputGroup-sizing-sm">
               Comment
             </span>
+
             <input
               type="text"
-              className="form-control w-25"
+              className="form-control w-25 "
               aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm"
               value={commentText}
               onChange={handleOnChangeComment}
             />
-            <i
-              className="fa-regular fa-paper-plane fs-4 text-muted mx-2 p-2 my-auto"
+
+            <button
+              className="btn btn-secondary border border-1 fw-bold"
               onClick={handleClickSendComment}
-            ></i>
+            >
+              Send
+            </button>
+
+            <i className="fa-regular fa-paper-plane fs-4 text-muted mx-2 p-2 my-auto"></i>
           </div>
+
+          {commentsValue.length === 0 ? (
+            <div className={`d-${commentDisplay} mb-1 mt-3`}></div>
+          ) : (
+            <div className={`d-${commentDisplay} mb-1 mt-3`}>
+              {commentsValue.map((cmt) => {
+                return (
+                  <div key={cmt.commentUser} className=" mt-1">
+                    <CommentsSection
+                      cmt={cmt}
+                      handleDeleteComment={handleDeleteComment}
+                      commentDisplay={commentDisplay}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="d-flex justify-content-center align-items-center ">
             <i
               className="fa-solid fa-caret-down pb-2 btn "
@@ -245,19 +289,6 @@ export default function Blogcard(props) {
             ></i>
           </div>
         </div>
-        {commentsValue.length === 0 ? (
-          <div className={`d-${commentDisplay} mb-3`}></div>
-        ) : (
-          <div className={`d-${commentDisplay} mb-3`}>
-            {commentsValue.map((cmt) => {
-              return (
-                <div key={cmt.commentUser} className=" mt-2">
-                  <CommentsSection cmt={cmt} commentDisplay={commentDisplay} />
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -30,6 +30,7 @@ export default function UserDisplay(props) {
                   minWidth: "50px",
                   minHeight: "50px",
                   borderRadius: "10px",
+                  objectFit: "cover",
                 }}
               />
             </div>

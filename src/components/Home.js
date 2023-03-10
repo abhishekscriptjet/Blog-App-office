@@ -17,6 +17,7 @@ export default function Home() {
     getFollowingBlog,
     setClickUserDetails,
     getUserDetails,
+    getFollowingFilterBlog,
   } = contextBlog;
   const [editClick, setEditClick] = useState(false);
   const [alluser, setAlluser] = useState([]);
@@ -117,14 +118,11 @@ export default function Home() {
   const topicFilter = async (topic) => {
     const blog = await getFollowingBlog();
     if (topic === "sports") {
-      const blogFilter = blog.filter((b) => b.topic === "sports");
-      setUserBlog(blogFilter);
+      setUserBlog(await getFollowingFilterBlog("sports"));
     } else if (topic === "science") {
-      const blogFilter = blog.filter((b) => b.topic === "science");
-      setUserBlog(blogFilter);
+      setUserBlog(await getFollowingFilterBlog("science"));
     } else if (topic === "teaching") {
-      const blogFilter = blog.filter((b) => b.topic === "teaching");
-      setUserBlog(blogFilter);
+      setUserBlog(await getFollowingFilterBlog("teaching"));
     } else if (topic === "all") {
       setUserBlog(blog);
     } else {

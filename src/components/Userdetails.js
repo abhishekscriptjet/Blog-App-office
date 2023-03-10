@@ -10,7 +10,8 @@ const Userdetails = (props) => {
   const navigate = useNavigate();
 
   const contextBlog = useContext(context);
-  const { createUserDetails, userDetails, getUserDetails } = contextBlog;
+  const { createUserDetails, userDetails, getUserDetails, showAlert } =
+    contextBlog;
 
   const [picture, setPicture] = useState(null);
 
@@ -870,6 +871,8 @@ const Userdetails = (props) => {
       createUserDetails(details);
       setIsSubmit(false);
       navigate("../profile");
+    } else {
+      showAlert("Invelid given data.", "danger");
     }
   };
 
@@ -882,94 +885,81 @@ const Userdetails = (props) => {
 
     if (!value.firstName) {
       errors.firstName = "*Firstname is required. ";
-      setIsSubmit(false);
     } else if (value.firstName.length < 3) {
       errors.firstName = "*Firstname should not less than 3 charactors.";
-      setIsSubmit(false);
     } else if (!regexName.test(value.firstName)) {
       errors.firstName = "*Firstname should only have Alphabets.";
-      setIsSubmit(false);
     }
-    if (!value.email) {
-      errors.email = "*Email is required. ";
-      setIsSubmit(false);
-    } else if (!regexEmail.test(value.email)) {
-      errors.email = "*This is not a valid email format!";
-      setIsSubmit(false);
-    }
+    // if (!value.email) {
+    //   errors.email = "*Email is required. ";
+    //   setIsSubmit(false);
+    // } else if (!regexEmail.test(value.email)) {
+    //   errors.email = "*This is not a valid email format!";
+    //   setIsSubmit(false);
+    // }
     if (!value.lastName) {
       errors.lastName = "*Lastname is required. ";
-      setIsSubmit(false);
     } else if (value.lastName.length < 3) {
       errors.lastName = "*Lastname should not less than 3 charactors.";
-      setIsSubmit(false);
     } else if (!regexName.test(value.lastName)) {
       errors.lastName = "*Lastname should only have Alphabets.";
-      setIsSubmit(false);
     }
-    if (!value.userName) {
-      errors.userName = "*Username is required. ";
-      setIsSubmit(false);
-    } else if (value.userName.length < 3) {
-      errors.userName = "*Username should not less than 3 charactors.";
-      setIsSubmit(false);
-    } else if (!regexUsername.test(value.userName)) {
-      errors.userName = "*Username should not have any spaces.";
-      setIsSubmit(false);
-    }
+    // if (!value.userName) {
+    //   errors.userName = "*Username is required. ";
+    //   setIsSubmit(false);
+    // } else if (value.userName.length < 3) {
+    //   errors.userName = "*Username should not less than 3 charactors.";
+    //   setIsSubmit(false);
+    // } else if (!regexUsername.test(value.userName)) {
+    //   errors.userName = "*Username should not have any spaces.";
+    //   setIsSubmit(false);
+    // }
     if (!value.city || value.city === "0") {
       errors.city = "*City is required. ";
-      setIsSubmit(false);
     }
     if (!value.state || value.state === "0") {
       errors.state = "*State is required. ";
-      setIsSubmit(false);
     }
     if (!value.country || value.country === "0") {
       errors.country = "*Country is required. ";
-      setIsSubmit(false);
     }
     if (!value.pincode) {
       errors.pincode = "*Pincode is required. ";
-      setIsSubmit(false);
     } else if (value.pincode.length < 6) {
       errors.pincode = "*Pincode should not less than 6 charactors.";
-      setIsSubmit(false);
     } else if (value.pincode.length > 6) {
       errors.pincode = "*Pincode should not greter than 6 charactors.";
-      setIsSubmit(false);
     }
-    if (!value.contactNumber) {
-      errors.contactNumber = "*Contact number is required. ";
-      setIsSubmit(false);
-    } else if (value.contactNumber.length < 10) {
-      errors.contactNumber =
-        "*Contact number should not less than 10 charactors.";
-      setIsSubmit(false);
-    } else if (value.contactNumber.length > 10) {
-      errors.contactNumber =
-        "*Contact number should not greter than 10 charactors.";
-      setIsSubmit(false);
-    }
+    // if (!value.contactNumber) {
+    //   errors.contactNumber = "*Contact number is required. ";
+    //   setIsSubmit(false);
+    // } else if (value.contactNumber.length < 10) {
+    //   errors.contactNumber =
+    //     "*Contact number should not less than 10 charactors.";
+    //   setIsSubmit(false);
+    // } else if (value.contactNumber.length > 10) {
+    //   errors.contactNumber =
+    //     "*Contact number should not greter than 10 charactors.";
+    //   setIsSubmit(false);
+    // }
     if (!value.gender) {
       errors.gender = "*Gender is required. ";
-      setIsSubmit(false);
     }
     if (!value.profession) {
       errors.profession = "*Profession is required. ";
-      setIsSubmit(false);
     } else if (!regexName.test(value.profession)) {
       errors.profession = "*Alphabets only allow.";
-      setIsSubmit(false);
     }
     if (!value.dateOfBirth) {
       errors.dateOfBirth = "*Date of birth is required.";
-      setIsSubmit(false);
     } else if (dateOfBirth > 2004) {
       errors.dateOfBirth = "*You are too young to submit the form.";
-      setIsSubmit(false);
-    } else {
+    }
+
+    if (Object.keys(errors).length === 0) {
       setIsSubmit(true);
+    } else {
+      setIsSubmit(false);
     }
 
     return errors;
@@ -993,8 +983,6 @@ const Userdetails = (props) => {
       loadState(detail.country);
       loadCity(detail.state);
       setPicture(userDetails[0].profileImg);
-    } else {
-      console.log("Loading...");
     }
   };
 
@@ -1018,12 +1006,7 @@ const Userdetails = (props) => {
 
   const handleSubmit = () => {
     setFormError(validate(name));
-    setIsSubmit(true);
-    if (isSubmit) {
-      saveState();
-    } else {
-      setIsSubmit(true);
-    }
+    saveState();
   };
 
   const handleClear = () => {

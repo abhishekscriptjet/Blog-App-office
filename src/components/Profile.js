@@ -211,6 +211,7 @@ export default function Profile() {
                         minHeight: "150px",
                         height: "150px",
                         zIndex: " 1",
+                        objectFit: "cover",
                       }}
                     />
                     <button
