@@ -4,6 +4,7 @@ import Bloginput from "./Bloginput";
 import context from "../contextAPI/context";
 import { useNavigate } from "react-router-dom";
 import UserDisplay from "./UserDisplay";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Home() {
   const clickEdit = useRef(null);
@@ -22,6 +23,7 @@ export default function Home() {
   const [editClick, setEditClick] = useState(false);
   const [alluser, setAlluser] = useState([]);
   const [userBlog, setUserBlog] = useState([]);
+  const [size, setSize] = useState(5);
 
   const saveToServer = async () => {
     await loadData();
@@ -34,7 +36,7 @@ export default function Home() {
   const loadData = async () => {
     await getUserDetails();
     setAlluser(await loadAllUser());
-    setUserBlog(await getFollowingBlog());
+    setUserBlog(await getFollowingBlog(size));
   };
 
   useEffect(() => {
@@ -55,8 +57,8 @@ export default function Home() {
   const handleFollow = async (id) => {
     let userid = { id: id };
     setFollowing(userid);
-    setUserBlog(await getFollowingBlog());
-    setUserBlog(await getFollowingBlog());
+    setUserBlog(await getFollowingBlog(size));
+    setUserBlog(await getFollowingBlog(size));
 
     let allUser = alluser;
     for (let index = 0; index < allUser.length; index++) {
@@ -116,7 +118,7 @@ export default function Home() {
   };
 
   const topicFilter = async (topic) => {
-    const blog = await getFollowingBlog();
+    const blog = await getFollowingBlog(size);
     if (topic === "sports") {
       setUserBlog(await getFollowingFilterBlog("sports"));
     } else if (topic === "science") {
@@ -130,37 +132,51 @@ export default function Home() {
     }
   };
 
+  const fetchMore = async () => {
+    setUserBlog(await getFollowingBlog(size + 5));
+    setSize(size + 5);
+  };
+
   return (
-    <div className="d-flex mb-4">
+    <div className="container d-flex justify-content-center align-items-center mb-4">
       <div
-        className="my-5 ms-5 me-2 d-none d-sm-block shadow-lg p-4"
+        className="d-none d-md-block shadow-lg p-0 me-5"
         style={{
           borderRadius: "10px",
+          height: "100vh",
+          marginTop: "30px",
+          marginBottom: "30px",
         }}
       >
-        <h4 className="text-center">Users</h4>
-        {alluser.length > 0
-          ? alluser
-              .filter((users) => {
-                return users.userid !== user._id;
-              })
-              .map((alluser) => {
-                return (
-                  <div key={alluser._id}>
-                    <UserDisplay
-                      alluser={alluser}
-                      user={user}
-                      handleClickOtherUser={handleClickOtherUser}
-                      handleFollow={handleFollow}
-                    />
-                  </div>
-                );
-              })
-          : ""}
+        <h4 className="text-center mt-4">Users</h4>
+        <div
+          className="px-5 pt-2 pb-5 mt-3"
+          style={{ height: "83vh", overflow: "auto", borderRadius: "10px" }}
+        >
+          {alluser.length > 0
+            ? alluser
+                .filter((users) => {
+                  return users.userid !== user._id;
+                })
+                .map((alluser) => {
+                  return (
+                    <div key={alluser._id}>
+                      <UserDisplay
+                        alluser={alluser}
+                        user={user}
+                        handleClickOtherUser={handleClickOtherUser}
+                        handleFollow={handleFollow}
+                      />
+                    </div>
+                  );
+                })
+            : ""}
+        </div>
       </div>
       <div
-        className="flex-grow-1 mx-sm-5 pb-2 shadow-lg"
+        className="pb-2 shadow-lg"
         style={{
+          height: "100vh",
           marginTop: "30px",
           marginBottom: "30px",
           borderRadius: "10px",
@@ -249,25 +265,37 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="container d-flex flex-wrap flex-xl-row justify-content-center align-items-center ">
-          {userBlog === []
-            ? "Please create blog"
-            : userBlog.map((blog) => {
-                return (
-                  <div
-                    key={blog._id}
-                    className="m-3"
-                    // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
-                  >
-                    <Blogcard
-                      blog={blog}
-                      user={user}
-                      saveToServer={saveToServer}
-                      handleEditClick={handleEditClick}
-                    />
-                  </div>
-                );
-              })}
+        <div
+          id="scrollableDiv"
+          className="container my-3 px-5"
+          style={{ height: "80vh", overflow: "auto", borderRadius: "10px" }}
+        >
+          <InfiniteScroll
+            dataLength={userBlog}
+            next={fetchMore}
+            hasMore={userBlog.length >= size}
+            loader={<h4 className="text-center">Loading...</h4>}
+            scrollableTarget="scrollableDiv"
+          >
+            {userBlog === []
+              ? "Please create blog"
+              : userBlog.map((blog) => {
+                  return (
+                    <div
+                      key={blog._id}
+                      className="mb-4"
+                      // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
+                    >
+                      <Blogcard
+                        blog={blog}
+                        user={user}
+                        saveToServer={saveToServer}
+                        handleEditClick={handleEditClick}
+                      />
+                    </div>
+                  );
+                })}
+          </InfiniteScroll>
         </div>
       </div>
     </div>

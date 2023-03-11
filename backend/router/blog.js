@@ -1,6 +1,6 @@
 const express = require("express");
 const blog = require("../schema/blog");
-const { body, validationResult, Result } = require("express-validator");
+const { body, validationResult, Result, param } = require("express-validator");
 const fetchuser = require("./fetchUser");
 const User = require("../schema/user");
 const UserDetails = require("../schema/userDetails");
@@ -68,19 +68,25 @@ router.get("/getuserblogs", fetchuser, async (req, res) => {
   }
 });
 
-router.get("/getfollowingblog", fetchuser, async (req, res) => {
+router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
   try {
-    const details = await UserDetails.find({ userid: req.userid });
-    const following = details[0].following;
-    const followingBlog = await blog.find({
-      userid: [...following, req.userid],
+    const details = await UserDetails.find({
+      userid: req.userid,
     });
+    const following = details[0].following;
+    const followingBlog = await blog
+      .find({
+        userid: [...following, req.userid],
+      })
+      .limit(req.params.size);
+    // console.log("Blog ", followingBlog);
     res.status(200).json({
       success: true,
       followingBlog: followingBlog,
       msg: "Get Following Blog",
     });
   } catch (error) {
+    // console.log("ERR ", error);
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });

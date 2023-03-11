@@ -4,7 +4,7 @@ import UserIcon from "../sources/user.png";
 
 export default function CommentsSection(props) {
   const contexts = useContext(context);
-  const { getCommentUserDetailsBe } = contexts;
+  const { getCommentUserDetailsBe, formatTime, formatDate } = contexts;
   const { data, commentUser } = props.cmt;
   const { handleDeleteComment } = props;
 
@@ -22,19 +22,6 @@ export default function CommentsSection(props) {
   useEffect(() => {
     loadData();
   }, [props.commentDisplay]);
-
-  const formatDate = (date) => {
-    const newDate = new Date(date);
-    const currentTime = newDate.toLocaleTimeString();
-    const currentMonth = newDate.getMonth();
-    const monthString =
-      currentMonth >= 10 ? currentMonth + 1 : `0${currentMonth + 1}`;
-    const currentDate = newDate.getDate();
-    const dateString = currentDate >= 10 ? currentDate : `0${currentDate}`;
-    return `${newDate.getFullYear()}-${monthString}-${currentDate} | ${currentTime}`;
-  };
-
-  // console.log("date ", formatDate(cmt.commentDate));
 
   return (
     <div>
@@ -74,20 +61,28 @@ export default function CommentsSection(props) {
             ? data.map((cmt, i) => {
                 return (
                   <div className="mb-1 border" key={i}>
-                    <p className="d-flex justify-content-between text-muted px-3 py-1 ms-5 mb-0 rounded bg-white ">
+                    <div className="d-flex justify-content-between align-items-center text-muted ps-3 pe-2 py-1 ms-5 mb-0 rounded bg-white ">
                       {cmt.text}
-                      <span
-                        className="ms-auto text-muted px-0 py-1 ms-5 mb-0 rounded bg-white "
-                        style={{ fontSize: "10px" }}
-                      >
-                        {formatDate(cmt.commentDate)}
-                      </span>
+                      <div className="ms-auto text-center">
+                        <div
+                          className=" text-muted px-0 py-0 mb-0 rounded bg-white"
+                          style={{ fontSize: "10px" }}
+                        >
+                          {`${formatDate(cmt.commentDate)}`}
+                        </div>
+                        <div
+                          className="text-muted px-0 py-0 mb-0 rounded bg-white "
+                          style={{ fontSize: "10px" }}
+                        >
+                          {`${formatTime(cmt.commentDate)}`}
+                        </div>
+                      </div>
                       <i
-                        className="fa-regular fa-trash-can ms-2 mt-1"
+                        className="fa-regular fa-trash-can ms-2"
                         style={{ cursor: "pointer" }}
                         onClick={() => handleDeleteComment(cmt)}
                       ></i>
-                    </p>
+                    </div>
                   </div>
                 );
               })

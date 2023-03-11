@@ -55,7 +55,7 @@ export default function UserDisplay(props) {
                 className=" rounded-3 py-1 px-2 mb-2"
                 style={{ backgroundColor: "#efefef" }}
               >
-                <div className="d-flex justify-content-center text-center">
+                <div className="d-flex justify-content-center flex-sm-column flex-md-row text-center">
                   <div>
                     <p className="small text-muted mb-1">Post</p>
                     <p className="mb-0">{alluser.noOfPost}</p>

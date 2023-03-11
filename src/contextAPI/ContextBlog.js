@@ -244,10 +244,10 @@ function ContextBlog(props) {
     }
   };
 
-  const getFollowingBlog = async () => {
+  const getFollowingBlog = async (size) => {
     const user = localStorage.getItem("blogToken");
     const response = await fetch(
-      "http://localhost:5000/blog/getfollowingblog",
+      `http://localhost:5000/blog/getfollowingblog/${size}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -424,6 +424,35 @@ function ContextBlog(props) {
     }
   };
 
+  const formatDate = (date) => {
+    const newDate = new Date(date);
+    const month = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const currentMonth = newDate.getMonth();
+    // const monthString = currentMonth >= 10 ? currentMonth : `0${currentMonth}`;
+    const currentDate = newDate.getDate();
+    const dateString = currentDate >= 10 ? currentDate : `0${currentDate}`;
+    return `${dateString}-${month[currentMonth]}-${newDate.getFullYear()}`;
+  };
+
+  const formatTime = (date) => {
+    const newDate = new Date(date);
+    const currentTime = newDate.toLocaleTimeString();
+    return `${currentTime}`;
+  };
+
   const reset = () => {
     setUser({});
     setUserBlog([]);
@@ -440,6 +469,8 @@ function ContextBlog(props) {
         alluser,
         userDetails,
         clickUser,
+        formatTime,
+        formatDate,
         deleteEndPoint,
         getUserBlogs,
         createBlog,

@@ -17,6 +17,7 @@ export default function Profile() {
     getFollowing,
     getFollower,
     setFollowing,
+    formatDate,
   } = contextBlog;
 
   const [userBlog, setUserBlog] = useState([]);
@@ -312,8 +313,12 @@ export default function Profile() {
                       <p className="font-italic mb-0">
                         <strong>Birth Date </strong>
                         {userDetails.length > 0
-                          ? capitaliz(userDetails[0].dateOfBirth)
+                          ? formatDate(userDetails[0].dateOfBirth)
                           : ""}
+                      </p>
+                      <p className="font-italic mb-0">
+                        <strong>Since </strong>
+                        {user ? formatDate(user.date) : ""}
                       </p>
                     </div>
                   </div>

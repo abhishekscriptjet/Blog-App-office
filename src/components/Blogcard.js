@@ -151,7 +151,7 @@ export default function Blogcard(props) {
     <div
       className="card"
       style={{
-        width: "25rem",
+        width: "35rem",
         backgroundColor: "inherit",
         borderRadius: "10px",
       }}
@@ -217,7 +217,7 @@ export default function Blogcard(props) {
           src={src}
           className="card-img-top"
           alt="..."
-          style={{ width: "inharite", height: "20rem" }}
+          style={{ width: "inharite", height: "30rem" }}
         />
         <div className="card-body">
           <h5 className="card-title">{topic}</h5>
