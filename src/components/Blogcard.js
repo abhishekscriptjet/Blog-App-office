@@ -4,8 +4,17 @@ import UserIcon from "../sources/user.png";
 import CommentsSection from "./CommentsSection";
 
 export default function Blogcard(props) {
-  const { topic, description, src, _id, upVote, downVote, userid, comment } =
-    props.blog;
+  const {
+    topic,
+    description,
+    src,
+    _id,
+    upVote,
+    downVote,
+    userid,
+    comment,
+    date,
+  } = props.blog;
   const alertContext = useContext(context);
   const {
     showAlert,
@@ -15,7 +24,9 @@ export default function Blogcard(props) {
     getBlogUserDetailsBe,
     setBlogCommentBe,
     deleteBlogCommentBe,
+    formatTime,
   } = alertContext;
+
   const user = props.user;
 
   const [like, setLike] = useState("regular");
@@ -223,20 +234,25 @@ export default function Blogcard(props) {
           <h5 className="card-title">{topic}</h5>
           <p className="card-text">{description}</p>
         </div>
-        <div className="mx-2 d-flex justify-content-left align-items-center ">
-          <div className=" p-2">
-            <i
-              className={`fa-${like} fa-heart text-danger fs-3`}
-              onClick={handleLike}
-            ></i>
-            <label className="fw-bold mx-2 ">{likeValue}</label>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="mx-2 d-flex justify-content-start align-items-center ">
+            <div className=" p-2">
+              <i
+                className={`fa-${like} fa-heart text-danger fs-3`}
+                onClick={handleLike}
+              ></i>
+              <label className="fw-bold mx-2 ">{likeValue}</label>
+            </div>
+            <div className=" mx-2">
+              <i
+                className={`fa-solid ${dislike} fs-3 text-black`}
+                onClick={handleDisLike}
+              ></i>
+              <label className="fw-bold mx-2">{disLikeValue}</label>
+            </div>
           </div>
-          <div className=" mx-2">
-            <i
-              className={`fa-solid ${dislike} fs-3 text-black`}
-              onClick={handleDisLike}
-            ></i>
-            <label className="fw-bold mx-2">{disLikeValue}</label>
+          <div className="me-3">
+            <div className="text-muted">{formatTime(date)}</div>
           </div>
         </div>
         <hr className="my-0 mx-3" />
@@ -274,6 +290,7 @@ export default function Blogcard(props) {
                   <div key={cmt.commentUser} className=" mt-1">
                     <CommentsSection
                       cmt={cmt}
+                      user={user}
                       handleDeleteComment={handleDeleteComment}
                       commentDisplay={commentDisplay}
                     />

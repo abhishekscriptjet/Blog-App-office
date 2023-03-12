@@ -17,8 +17,8 @@ export default function UserDisplay(props) {
         }}
         key={alluser._id}
       >
-        <div className="card-body p-2 ">
-          <div className="d-flex  flex-column flex-xxl-row text-black  ">
+        <div className="card-body p-2 w-100 ">
+          <div className="d-flex flex-sm-row flex-md-row flex-lg-column flex-xl-column flex-xxl-row text-black  ">
             <div className="d-flex justify-content-evenly align-items-center">
               <img
                 src={alluser.profileImg ? alluser.profileImg : UserIcon}
@@ -55,7 +55,7 @@ export default function UserDisplay(props) {
                 className=" rounded-3 py-1 px-2 mb-2"
                 style={{ backgroundColor: "#efefef" }}
               >
-                <div className="d-flex justify-content-center flex-sm-column flex-md-row text-center">
+                <div className="d-flex justify-content-center flex-lg-row text-center">
                   <div>
                     <p className="small text-muted mb-1">Post</p>
                     <p className="mb-0">{alluser.noOfPost}</p>

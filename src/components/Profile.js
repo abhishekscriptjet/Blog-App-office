@@ -18,6 +18,7 @@ export default function Profile() {
     getFollower,
     setFollowing,
     formatDate,
+    formatTime,
   } = contextBlog;
 
   const [userBlog, setUserBlog] = useState([]);
@@ -305,20 +306,20 @@ export default function Profile() {
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
-                        <strong>Gender </strong>
+                        <strong>Gender - </strong>
                         {userDetails.length > 0
                           ? capitaliz(userDetails[0].gender)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
-                        <strong>Birth Date </strong>
+                        <strong>Birth Date - </strong>
                         {userDetails.length > 0
                           ? formatDate(userDetails[0].dateOfBirth)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
-                        <strong>Since </strong>
-                        {user ? formatDate(user.date) : ""}
+                        <strong>Since - </strong>
+                        {user ? formatTime(user.date) : ""}
                       </p>
                     </div>
                   </div>

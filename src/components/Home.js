@@ -140,7 +140,7 @@ export default function Home() {
   return (
     <div className="container d-flex justify-content-center align-items-center mb-4">
       <div
-        className="d-none d-md-block shadow-lg p-0 me-5"
+        className="d-none d-lg-block shadow-lg p-0 me-5"
         style={{
           borderRadius: "10px",
           height: "100vh",

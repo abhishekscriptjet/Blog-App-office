@@ -1,20 +1,43 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import icon from "../sources/navicon.png";
 import context from "../contextAPI/context";
+import UserDisplay from "./UserDisplay";
 
 export default function Navebar() {
   const alertContext = useContext(context);
-  const { showAlert, reset } = alertContext;
+  const { showAlert, reset, loadAllUser, user } = alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
+
+  const [query, setQuery] = useState("");
+  const [alluser, setAlluser] = useState([]);
+
   const handleLogout = (e) => {
     localStorage.removeItem("blogToken");
     reset();
     showAlert("Logout Successfully.", "success");
     navigate("/login");
   };
+  const loadData = async () => {
+    setAlluser(await loadAllUser());
+  };
+  useEffect(() => {
+    if (localStorage.getItem("blogToken")) {
+      loadData();
+    } else {
+      navigate("./login");
+    }
+    //eslint-disable-next-line
+  }, []);
+
+  console.log("search ", query);
+
+  const handleSearchOnChange = (e) => {
+    setQuery(e.target.value);
+  };
+  const handleSearchClick = () => {};
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -61,49 +84,63 @@ export default function Navebar() {
                   Profile
                 </Link>
               </li>
-              <li className="nav-item dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="/"
-                  id="navbarDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  Dropdown
-                </Link>
-                <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li>
-                    <Link className="dropdown-item" to="/">
-                      Action
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/">
-                      Another action
-                    </Link>
-                  </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/">
-                      Something else here
-                    </Link>
-                  </li>
-                </ul>
-              </li>
             </ul>
-            <form className="d-flex">
+            <form className="d-flex dropdown">
               <input
-                className="form-control me-2 py-1"
-                type="search"
+                className="form-control me-2 py-1 dropdown-toggle"
                 placeholder="Search"
-                aria-label="Search"
+                id="dropdownMenu2"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{
+                  width: "30vw",
+                }}
+                onChange={handleSearchOnChange}
+                onClick={handleSearchClick}
               />
-              <button className="btn btn-primary py-1 " type="submit">
-                Search
-              </button>
+
+              <div
+                className="dropdown-menu text-center"
+                aria-labelledby="dropdownMenu2"
+                style={{
+                  width: "100%",
+                  height: "50vh",
+                  borderRadius: "10px",
+                }}
+              >
+                <div
+                  className="d-flex align-items-center flex-column  "
+                  style={{
+                    overflow: "auto",
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "10px",
+                  }}
+                >
+                  {alluser.length > 0
+                    ? alluser
+                        .filter((users) => {
+                          return (
+                            users.firstName === query ||
+                            users.lastName === query ||
+                            users.user.name === query
+                          );
+                        })
+                        .map((alluser) => {
+                          return (
+                            <div key={alluser._id}>
+                              <UserDisplay
+                                alluser={alluser}
+                                user={user}
+                                // handleClickOtherUser={handleClickOtherUser}
+                                // handleFollow={handleFollow}
+                              />
+                            </div>
+                          );
+                        })
+                    : ""}
+                </div>
+              </div>
             </form>
 
             {!localStorage.getItem("blogToken") ? (

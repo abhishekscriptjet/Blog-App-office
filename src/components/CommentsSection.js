@@ -6,7 +6,7 @@ export default function CommentsSection(props) {
   const contexts = useContext(context);
   const { getCommentUserDetailsBe, formatTime, formatDate } = contexts;
   const { data, commentUser } = props.cmt;
-  const { handleDeleteComment } = props;
+  const { handleDeleteComment, user } = props;
 
   const [commentUserDetails, setCommentUserDetails] = useState([]);
 
@@ -63,12 +63,14 @@ export default function CommentsSection(props) {
                   <div className="mb-1 border" key={i}>
                     <div className="d-flex justify-content-between align-items-center text-muted ps-3 pe-2 py-1 ms-5 mb-0 rounded bg-white ">
                       {cmt.text}
-                      <div className="ms-auto text-center">
+                      <div className="ms-auto text-end">
                         <div
                           className=" text-muted px-0 py-0 mb-0 rounded bg-white"
                           style={{ fontSize: "10px" }}
                         >
-                          {`${formatDate(cmt.commentDate)}`}
+                          {
+                            // `${formatDate(cmt.commentDate)}`
+                          }
                         </div>
                         <div
                           className="text-muted px-0 py-0 mb-0 rounded bg-white "
@@ -78,7 +80,9 @@ export default function CommentsSection(props) {
                         </div>
                       </div>
                       <i
-                        className="fa-regular fa-trash-can ms-2"
+                        className={`fa-regular fa-trash-can ms-2 ${
+                          commentUser === user._id ? "d-block" : "d-none"
+                        }`}
                         style={{ cursor: "pointer" }}
                         onClick={() => handleDeleteComment(cmt)}
                       ></i>
