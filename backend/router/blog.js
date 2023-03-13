@@ -78,6 +78,7 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
       .find({
         userid: [...following, req.userid],
       })
+      .sort({ date: -1 })
       .limit(req.params.size);
     // console.log("Blog ", followingBlog);
     res.status(200).json({
@@ -420,16 +421,19 @@ router.post("/getclickuserblog", fetchuser, async (req, res) => {
   }
 });
 
-router.post("/getfollowingfilterblog", fetchuser, async (req, res) => {
+router.post("/getfollowingfilterblog/:size", fetchuser, async (req, res) => {
   try {
     const details = await UserDetails.find({
       userid: req.userid,
     });
     const following = details[0].following;
-    const followingFilterBlog = await blog.find({
-      userid: [...following, req.userid],
-      topic: req.body.topic,
-    });
+    const followingFilterBlog = await blog
+      .find({
+        userid: [...following, req.userid],
+        topic: req.body.topic,
+      })
+      .sort({ date: -1 })
+      .limit(req.params.size);
     res.status(200).json({
       success: true,
       followingFilterBlog: followingFilterBlog,

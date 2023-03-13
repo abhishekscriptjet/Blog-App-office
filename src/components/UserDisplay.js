@@ -7,9 +7,9 @@ export default function UserDisplay(props) {
   const {} = contextBlog;
 
   return (
-    <div>
+    <div className="">
       <div
-        className="card d-flex justify-content-center align-items-center my-3 shadow-lg"
+        className="card d-flex justify-content-center align-items-center my-3 shadow-lg w-100"
         style={{
           borderRadius: "15px",
           width: "22vw",
@@ -17,24 +17,26 @@ export default function UserDisplay(props) {
         }}
         key={alluser._id}
       >
-        <div className="card-body p-2 w-100 ">
+        <div className="card-body p-2 ">
           <div className="d-flex flex-sm-row flex-md-row flex-lg-column flex-xl-column flex-xxl-row text-black  ">
-            <div className="d-flex justify-content-evenly align-items-center">
+            <div className="d-flex justify-content-evenly align-items-center mt-md-0 mt-lg-3 mt-xl-3 mt-xxl-0">
               <img
                 src={alluser.profileImg ? alluser.profileImg : UserIcon}
                 alt="Generic placeholder"
-                className="img-fluid "
+                className="img-fluid"
                 style={{
                   width: "80%",
                   height: "80%",
                   minWidth: "50px",
                   minHeight: "50px",
+                  maxHeight: "250px",
+                  maxWidth: "200px",
                   borderRadius: "10px",
                   objectFit: "cover",
                 }}
               />
             </div>
-            <div className="d-flex flex-column ms-0 ms-lg-3 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
+            <div className="d-flex flex-column ms-0 me-4 me-md-4 ms-lg-4 mt-3 me-lg-4  justify-content-center justify-content-xxl-start align-items-center align-items-xxl-start ">
               <div
                 className="text-center "
                 style={{ cursor: "pointer" }}

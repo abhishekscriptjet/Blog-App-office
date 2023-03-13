@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import context from "./context";
 
 function ContextBlog(props) {
@@ -8,6 +8,7 @@ function ContextBlog(props) {
   const [alluser, setAllUser] = useState([]);
   const [userDetails, setUserDetails] = useState([]);
   const [clickUser, setClickUser] = useState({});
+  const [login, setLogin] = useState("");
 
   const showAlert = (massage, type) => {
     setAlert({
@@ -49,12 +50,15 @@ function ContextBlog(props) {
     }
   };
 
-  const loadAllUser = async () => {
+  const loadAllUser = async (size) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/getalluser", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    const response = await fetch(
+      `http://localhost:5000/user/getalluser/${size}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       const alluser = res.details;
@@ -381,10 +385,10 @@ function ContextBlog(props) {
     }
   };
 
-  const getFollowingFilterBlog = async (data) => {
+  const getFollowingFilterBlog = async (data, size) => {
     const user = localStorage.getItem("blogToken");
     const response = await fetch(
-      "http://localhost:5000/blog/getfollowingfilterblog",
+      `http://localhost:5000/blog/getfollowingfilterblog/${size}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -559,7 +563,24 @@ function ContextBlog(props) {
     setUserBlog([]);
     setUserDetails([]);
     setAllUser([]);
+    setLogin("");
   };
+
+  const setLoginFunc = () => {
+    setLogin(localStorage.getItem("blogToken"));
+  };
+
+  const loadData = async () => {
+    await loadAllUser(10);
+    await getUser();
+    await getUserDetails();
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("blogToken")) {
+      loadData();
+    }
+  }, [login]);
 
   return (
     <context.Provider
@@ -570,17 +591,17 @@ function ContextBlog(props) {
         alluser,
         userDetails,
         clickUser,
+        setLoginFunc,
+        loadAllUser,
         formatTime,
         formatDate,
+        getUserDetails,
         deleteEndPoint,
         getUserBlogs,
         createBlog,
-        getUser,
         showAlert,
         editBlog,
         createUserDetails,
-        getUserDetails,
-        loadAllUser,
         reset,
         setFollowing,
         getFollowing,

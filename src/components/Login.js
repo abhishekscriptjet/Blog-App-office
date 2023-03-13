@@ -6,7 +6,7 @@ import context from "../contextAPI/context";
 
 export default function Login() {
   const alertContext = useContext(context);
-  const { showAlert, getUserDetails } = alertContext;
+  const { showAlert, getUserDetails, setLoginFunc } = alertContext;
 
   const [credentials, setCredentials] = useState({
     email: "",
@@ -42,8 +42,10 @@ export default function Login() {
       const oldUser = await getUserDetails();
       if (oldUser) {
         navigate("/");
+        await setLoginFunc();
       } else {
         navigate("/userdetails");
+        await setLoginFunc();
       }
     }
   };

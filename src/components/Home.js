@@ -9,24 +9,28 @@ import InfiniteScroll from "react-infinite-scroll-component";
 export default function Home() {
   const clickEdit = useRef(null);
   const navigate = useNavigate();
+
   const contextBlog = useContext(context);
   const {
-    getUser,
     user,
+    alluser,
     loadAllUser,
+    userDetails,
     setFollowing,
     getFollowingBlog,
     setClickUserDetails,
-    getUserDetails,
     getFollowingFilterBlog,
   } = contextBlog;
+
   const [editClick, setEditClick] = useState(false);
-  const [alluser, setAlluser] = useState([]);
+  const [allusers, setAllusers] = useState(alluser);
   const [userBlog, setUserBlog] = useState([]);
-  const [size, setSize] = useState(5);
+  const [size, setSize] = useState(10);
+  const [userSize, setUserSize] = useState(10);
+  const [filter, setFilter] = useState("all");
 
   const saveToServer = async () => {
-    await loadData();
+    setUserBlog(await getFollowingBlog(size));
   };
 
   const resetEditClick = () => {
@@ -34,20 +38,21 @@ export default function Home() {
   };
 
   const loadData = async () => {
-    await getUserDetails();
-    setAlluser(await loadAllUser());
     setUserBlog(await getFollowingBlog(size));
   };
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
-      getUser();
       loadData();
     } else {
       navigate("./login");
     }
     //eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    setAllusers(alluser);
+  }, [userBlog]);
 
   const handleEditClick = (blog) => {
     clickEdit.current.click();
@@ -60,7 +65,7 @@ export default function Home() {
     setUserBlog(await getFollowingBlog(size));
     setUserBlog(await getFollowingBlog(size));
 
-    let allUser = alluser;
+    let allUser = allusers;
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
       if (element.userid === id) {
@@ -84,7 +89,6 @@ export default function Home() {
         break;
       }
     }
-
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
       if (element.userid === user._id) {
@@ -109,7 +113,7 @@ export default function Home() {
         break;
       }
     }
-    setAlluser(allUser);
+    setAllusers(allUser);
   };
 
   const handleClickOtherUser = async (data) => {
@@ -118,23 +122,48 @@ export default function Home() {
   };
 
   const topicFilter = async (topic) => {
+    setSize(10);
     const blog = await getFollowingBlog(size);
     if (topic === "sports") {
-      setUserBlog(await getFollowingFilterBlog("sports"));
+      setFilter("sports");
+      setUserBlog(await getFollowingFilterBlog("sports", size));
     } else if (topic === "science") {
-      setUserBlog(await getFollowingFilterBlog("science"));
+      setFilter("science");
+      setUserBlog(await getFollowingFilterBlog("science", size));
     } else if (topic === "teaching") {
-      setUserBlog(await getFollowingFilterBlog("teaching"));
+      setFilter("teaching");
+      setUserBlog(await getFollowingFilterBlog("teaching", size));
     } else if (topic === "all") {
+      setFilter("all");
       setUserBlog(blog);
     } else {
+      setFilter("all");
       setUserBlog(blog);
     }
   };
 
   const fetchMore = async () => {
-    setUserBlog(await getFollowingBlog(size + 5));
-    setSize(size + 5);
+    if (filter === "sports") {
+      setUserBlog(await getFollowingFilterBlog("sports", size + 10));
+      setSize(size + 10);
+    } else if (filter === "science") {
+      setUserBlog(await getFollowingFilterBlog("science", size + 10));
+      setSize(size + 10);
+    } else if (filter === "teaching") {
+      setUserBlog(await getFollowingFilterBlog("teaching", size + 10));
+      setSize(size + 10);
+    } else if (filter === "all") {
+      setUserBlog(await getFollowingBlog(size + 10));
+      setSize(size + 10);
+    } else {
+      setUserBlog(await getFollowingBlog(size + 10));
+      setSize(size + 10);
+    }
+  };
+
+  const fetchMoreUsers = async () => {
+    setAllusers(await loadAllUser(userSize + 10));
+    setUserSize(userSize + 10);
   };
 
   return (
@@ -150,27 +179,36 @@ export default function Home() {
       >
         <h4 className="text-center mt-4">Users</h4>
         <div
+          id="scrollableDivUser"
           className="px-5 pt-2 pb-5 mt-3"
           style={{ height: "83vh", overflow: "auto", borderRadius: "10px" }}
         >
-          {alluser.length > 0
-            ? alluser
-                .filter((users) => {
-                  return users.userid !== user._id;
-                })
-                .map((alluser) => {
-                  return (
-                    <div key={alluser._id}>
-                      <UserDisplay
-                        alluser={alluser}
-                        user={user}
-                        handleClickOtherUser={handleClickOtherUser}
-                        handleFollow={handleFollow}
-                      />
-                    </div>
-                  );
-                })
-            : ""}
+          <InfiniteScroll
+            dataLength={allusers}
+            next={fetchMoreUsers}
+            hasMore={allusers.length >= userSize}
+            loader={<h4 className="text-center">Loading...</h4>}
+            scrollableTarget="scrollableDivUser"
+          >
+            {allusers.length > 0
+              ? allusers
+                  .filter((users) => {
+                    return users.userid !== user._id;
+                  })
+                  .map((alluser) => {
+                    return (
+                      <div key={alluser._id}>
+                        <UserDisplay
+                          alluser={alluser}
+                          user={user}
+                          handleClickOtherUser={handleClickOtherUser}
+                          handleFollow={handleFollow}
+                        />
+                      </div>
+                    );
+                  })
+              : ""}
+          </InfiniteScroll>
         </div>
       </div>
       <div

@@ -4,15 +4,16 @@ import icon from "../sources/navicon.png";
 import context from "../contextAPI/context";
 import UserDisplay from "./UserDisplay";
 
-export default function Navebar() {
+export default function Navebar(props) {
   const alertContext = useContext(context);
-  const { showAlert, reset, loadAllUser, user } = alertContext;
+  const { showAlert, reset, loadAllUser, user, alluser, userDetails } =
+    alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
 
   const [query, setQuery] = useState("");
-  const [alluser, setAlluser] = useState([]);
+  // const [alluser, setAlluser] = useState([]);
 
   const handleLogout = (e) => {
     localStorage.removeItem("blogToken");
@@ -21,7 +22,7 @@ export default function Navebar() {
     navigate("/login");
   };
   const loadData = async () => {
-    setAlluser(await loadAllUser());
+    // setAlluser(await loadAllUser());
   };
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
@@ -32,7 +33,7 @@ export default function Navebar() {
     //eslint-disable-next-line
   }, []);
 
-  console.log("search ", query);
+  // console.log("search ", query);
 
   const handleSearchOnChange = (e) => {
     setQuery(e.target.value);
@@ -121,9 +122,15 @@ export default function Navebar() {
                     ? alluser
                         .filter((users) => {
                           return (
-                            users.firstName === query ||
-                            users.lastName === query ||
-                            users.user.name === query
+                            users.firstName
+                              .toLowerCase()
+                              .includes(query.toLocaleLowerCase()) ||
+                            users.lastName
+                              .toLowerCase()
+                              .includes(query.toLocaleLowerCase()) ||
+                            users.user.name
+                              .toLowerCase()
+                              .includes(query.toLocaleLowerCase())
                           );
                         })
                         .map((alluser) => {

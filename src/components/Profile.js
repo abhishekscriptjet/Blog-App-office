@@ -9,11 +9,9 @@ export default function Profile() {
   const clickFollowingRef = useRef(null);
   const contextBlog = useContext(context);
   const {
-    getUser,
-    getUserBlogs,
     user,
-    getUserDetails,
     userDetails,
+    getUserBlogs,
     getFollowing,
     getFollower,
     setFollowing,
@@ -24,11 +22,10 @@ export default function Profile() {
   const [userBlog, setUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
+  const [userDetail, setUserDetail] = useState(userDetails);
 
   const loadData = async () => {
-    await getUser();
     setUserBlog(await getUserBlogs());
-    await getUserDetails();
   };
 
   useEffect(() => {
@@ -40,17 +37,21 @@ export default function Profile() {
     //eslint-disable-next-line
   }, []);
 
-  const handleClose = () => {
-    getUserDetails();
-  };
+  useEffect(() => {
+    setUserDetail(userDetails);
+  }, [userBlog]);
+
+  const handleClose = () => {};
 
   const capitaliz = (string) => {
     let str = string.charAt(0).toUpperCase() + string.slice(1);
     return str;
   };
+
   const handleEditProfile = () => {
     navigate("../userdetails");
   };
+
   const handleFollowing = async (e) => {
     const btn = e.target.value;
     if (btn === "following") {
@@ -63,10 +64,10 @@ export default function Profile() {
       clickFollowingRef.current.click();
     }
   };
+
   const handleFollow = async (id) => {
     let userid = { id: id };
     setFollowing(userid);
-
     let allUser = follow;
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
@@ -96,7 +97,6 @@ export default function Profile() {
       const element = allUser[index];
       if (element.userid === user._id) {
         const include = element.following.includes(id);
-
         if (include === true) {
           let following = element.following.filter((d) => {
             return d !== id;
@@ -116,6 +116,24 @@ export default function Profile() {
         break;
       }
     }
+
+    let userProfile = userDetail[0];
+    const include = userProfile.following.includes(id);
+    if (include === true) {
+      let following = userProfile.following.filter((d) => {
+        return d !== id;
+      });
+      userProfile = {
+        ...userProfile,
+        following: [...following],
+      };
+    } else {
+      userProfile = {
+        ...userProfile,
+        following: [...userProfile.following, id],
+      };
+    }
+    setUserDetail([userProfile]);
     setFollow(allUser);
   };
 
@@ -202,8 +220,8 @@ export default function Profile() {
                   >
                     <img
                       src={
-                        userDetails.length > 0
-                          ? userDetails[0].profileImg
+                        userDetail.length > 0
+                          ? userDetail[0].profileImg
                           : UserIcon
                       }
                       alt="Generic placeholder"
@@ -228,17 +246,17 @@ export default function Profile() {
                   </div>
                   <div className="ms-3" style={{ marginTop: "110px" }}>
                     <h5>
-                      {userDetails.length > 0
-                        ? `${capitaliz(userDetails[0].firstName)} ${capitaliz(
-                            userDetails[0].lastName
+                      {userDetail.length > 0
+                        ? `${capitaliz(userDetail[0].firstName)} ${capitaliz(
+                            userDetail[0].lastName
                           )}`
                         : ""}
                     </h5>
                     <p className="">
-                      {userDetails.length > 0
-                        ? `${capitaliz(userDetails[0].city)}, ${capitaliz(
-                            userDetails[0].state
-                          )}, ${capitaliz(userDetails[0].country)}.`
+                      {userDetail.length > 0
+                        ? `${capitaliz(userDetail[0].city)}, ${capitaliz(
+                            userDetail[0].state
+                          )}, ${capitaliz(userDetail[0].country)}.`
                         : ""}
                     </p>
                   </div>
@@ -256,8 +274,8 @@ export default function Profile() {
                     </div>
                     <div className="text-center mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {userDetails.length > 0
-                          ? userDetails[0].follower.length
+                        {userDetail.length > 0
+                          ? userDetail[0].follower.length
                           : "0"}
                       </p>
                       <button
@@ -270,8 +288,8 @@ export default function Profile() {
                     </div>
                     <div className="text-center  mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {userDetails.length > 0
-                          ? userDetails[0].following.length
+                        {userDetail.length > 0
+                          ? userDetail[0].following.length
                           : "0"}
                       </p>
                       <button
@@ -295,26 +313,24 @@ export default function Profile() {
                       style={{ backgroundColor: "rgb(229 230 231)" }}
                     >
                       <p className="font-italic mb-1">
-                        {userDetails.length > 0
-                          ? userDetails[0].profession
-                          : ""}
+                        {userDetail.length > 0 ? userDetail[0].profession : ""}
                       </p>
                       <p className="font-italic mb-1">
                         Lives in{" "}
-                        {userDetails.length > 0
-                          ? capitaliz(userDetails[0].country)
+                        {userDetail.length > 0
+                          ? capitaliz(userDetail[0].country)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Gender - </strong>
-                        {userDetails.length > 0
-                          ? capitaliz(userDetails[0].gender)
+                        {userDetail.length > 0
+                          ? capitaliz(userDetail[0].gender)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Birth Date - </strong>
-                        {userDetails.length > 0
-                          ? formatDate(userDetails[0].dateOfBirth)
+                        {userDetail.length > 0
+                          ? formatDate(userDetail[0].dateOfBirth)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">

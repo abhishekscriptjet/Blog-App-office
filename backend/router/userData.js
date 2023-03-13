@@ -100,9 +100,9 @@ router.get("/getuserdetails", fetchuser, async (req, res) => {
   }
 });
 
-router.get("/getalluser", async (req, res) => {
+router.get("/getalluser/:size", async (req, res) => {
   try {
-    const details = await UserDetails.find();
+    const details = await UserDetails.find().limit(req.params.size);
     res.status(200).json({ success: true, details: details, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
