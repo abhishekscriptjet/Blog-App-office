@@ -4,6 +4,7 @@ import UserIcon from "../sources/user.png";
 import CommentsSection from "./CommentsSection";
 
 export default function Blogcard(props) {
+  const user = props.user;
   const {
     topic,
     description,
@@ -14,7 +15,9 @@ export default function Blogcard(props) {
     userid,
     comment,
     date,
+    userDetails,
   } = props.blog;
+
   const alertContext = useContext(context);
   const {
     showAlert,
@@ -27,8 +30,6 @@ export default function Blogcard(props) {
     formatTime,
   } = alertContext;
 
-  const user = props.user;
-
   const [like, setLike] = useState("regular");
   const [dislike, setDisLike] = useState("fa-heart");
   const [clickLike, setClickLike] = useState(0);
@@ -39,13 +40,15 @@ export default function Blogcard(props) {
   const [commentsValue, setCommentsValue] = useState([]);
 
   const [commentText, setcommentText] = useState("");
+
   const [blogUserDetails, setBlogUserDetails] = useState([]);
   const [commentDisplay, setCommentDisplay] = useState("none");
 
   const loadData = async () => {
-    const blogUserID = {
-      id: userid,
-    };
+    // const blogUserID = {
+    //   id: userid,
+    // };
+    // setBlogUserDetails(await getBlogUserDetailsBe(blogUserID));
     setBlogUserDetails([userDetails]);
     setCommentsValue(comment);
   };

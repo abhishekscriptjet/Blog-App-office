@@ -3,6 +3,7 @@ import context from "../contextAPI/context";
 import { Link, useNavigate } from "react-router-dom";
 import UserIcon from "../sources/user.png";
 import UserDisplay from "./UserDisplay";
+import Userdetails from "./Userdetails";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -17,12 +18,14 @@ export default function Profile() {
     setFollowing,
     formatDate,
     formatTime,
+    setStateAllUsersByProfileFollow,
   } = contextBlog;
 
   const [userBlog, setUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
   const [userDetail, setUserDetail] = useState(userDetails);
+  // const [timeOut, setTimeOut] = useState(false);
 
   const loadData = async () => {
     setUserBlog(await getUserBlogs());
@@ -38,8 +41,13 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
+    // setTimeout(() => {
+    //   setTimeOut(true);
+    // }, 1000);
     setUserDetail(userDetails);
   }, [userBlog]);
+
+  // useEffect(() => {}, [timeOut]);
 
   const handleClose = () => {};
 
@@ -117,7 +125,7 @@ export default function Profile() {
       }
     }
 
-    let userProfile = userDetail[0];
+    let userProfile = userDetail.length > 0 ? userDetail[0] : userDetails[0];
     const include = userProfile.following.includes(id);
     if (include === true) {
       let following = userProfile.following.filter((d) => {
@@ -133,6 +141,7 @@ export default function Profile() {
         following: [...userProfile.following, id],
       };
     }
+    setStateAllUsersByProfileFollow([...allUser, userProfile]);
     setUserDetail([userProfile]);
     setFollow(allUser);
   };
@@ -222,6 +231,8 @@ export default function Profile() {
                       src={
                         userDetail.length > 0
                           ? userDetail[0].profileImg
+                          : userDetails.length > 0
+                          ? userDetails[0].profileImg
                           : UserIcon
                       }
                       alt="Generic placeholder"
@@ -250,6 +261,10 @@ export default function Profile() {
                         ? `${capitaliz(userDetail[0].firstName)} ${capitaliz(
                             userDetail[0].lastName
                           )}`
+                        : userDetails.length > 0
+                        ? `${capitaliz(userDetails[0].firstName)} ${capitaliz(
+                            userDetails[0].lastName
+                          )}`
                         : ""}
                     </h5>
                     <p className="">
@@ -257,6 +272,10 @@ export default function Profile() {
                         ? `${capitaliz(userDetail[0].city)}, ${capitaliz(
                             userDetail[0].state
                           )}, ${capitaliz(userDetail[0].country)}.`
+                        : userDetails.length > 0
+                        ? `${capitaliz(userDetails[0].city)}, ${capitaliz(
+                            userDetails[0].state
+                          )}, ${capitaliz(userDetails[0].country)}.`
                         : ""}
                     </p>
                   </div>
@@ -276,6 +295,8 @@ export default function Profile() {
                       <p className="mb-1 h5">
                         {userDetail.length > 0
                           ? userDetail[0].follower.length
+                          : userDetails.length > 0
+                          ? userDetails[0].follower.length
                           : "0"}
                       </p>
                       <button
@@ -290,6 +311,8 @@ export default function Profile() {
                       <p className="mb-1 h5">
                         {userDetail.length > 0
                           ? userDetail[0].following.length
+                          : userDetails.length > 0
+                          ? userDetails[0].following.length
                           : "0"}
                       </p>
                       <button
@@ -313,24 +336,34 @@ export default function Profile() {
                       style={{ backgroundColor: "rgb(229 230 231)" }}
                     >
                       <p className="font-italic mb-1">
-                        {userDetail.length > 0 ? userDetail[0].profession : ""}
+                        {userDetail.length > 0
+                          ? userDetail[0].profession
+                          : userDetails.length > 0
+                          ? userDetails[0].profession
+                          : ""}
                       </p>
                       <p className="font-italic mb-1">
                         Lives in{" "}
                         {userDetail.length > 0
                           ? capitaliz(userDetail[0].country)
+                          : userDetails.length > 0
+                          ? capitaliz(userDetails[0].country)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Gender - </strong>
                         {userDetail.length > 0
                           ? capitaliz(userDetail[0].gender)
+                          : userDetails.length > 0
+                          ? capitaliz(userDetails[0].gender)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Birth Date - </strong>
                         {userDetail.length > 0
                           ? formatDate(userDetail[0].dateOfBirth)
+                          : userDetails.length > 0
+                          ? formatDate(userDetails[0].dateOfBirth)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">

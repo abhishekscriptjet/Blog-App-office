@@ -12,6 +12,7 @@ export default function Home() {
 
   const contextBlog = useContext(context);
   const {
+    setStateUserDetails,
     user,
     alluser,
     loadAllUser,
@@ -113,6 +114,10 @@ export default function Home() {
         break;
       }
     }
+    const updatedUserDetails = allUser.filter((data) => {
+      return data.userid === user._id;
+    });
+    setStateUserDetails(updatedUserDetails);
     setAllusers(allUser);
   };
 

@@ -582,6 +582,24 @@ function ContextBlog(props) {
     }
   }, [login]);
 
+  const setStateUserDetails = (data) => {
+    setUserDetails(data);
+  };
+  const setStateAllUsers = (data) => {
+    let allUsers = alluser;
+    for (let index = 0; index < allUsers.length; index++) {
+      const element = allUsers[index];
+      if (element.userid === data[0].userid) {
+        allUsers[index] = data[0];
+        break;
+      }
+    }
+    setAllUser(allUsers);
+  };
+  const setStateAllUsersByProfileFollow = (data) => {
+    setAllUser(data);
+  };
+
   return (
     <context.Provider
       value={{
@@ -591,6 +609,9 @@ function ContextBlog(props) {
         alluser,
         userDetails,
         clickUser,
+        setStateAllUsersByProfileFollow,
+        setStateAllUsers,
+        setStateUserDetails,
         setLoginFunc,
         loadAllUser,
         formatTime,

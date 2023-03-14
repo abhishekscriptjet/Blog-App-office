@@ -4,18 +4,19 @@ import UserIcon from "../sources/user.png";
 
 export default function CommentsSection(props) {
   const contexts = useContext(context);
-  const { getCommentUserDetailsBe, formatTime, formatDate } = contexts;
-  const { data, commentUser } = props.cmt;
+  const { getCommentUserDetailsBe, formatTime } = contexts;
+  const { data, commentUser, userDetails } = props.cmt;
   const { handleDeleteComment, user } = props;
 
   const [commentUserDetails, setCommentUserDetails] = useState([]);
 
   const loadData = async () => {
-    const commentUserID = {
-      id: commentUser,
-    };
+    // const commentUserID = {
+    //   id: commentUser,
+    // };
     if (props.commentDisplay === "block") {
-      setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
+      // setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
+      setCommentUserDetails([userDetails]);
     }
   };
 

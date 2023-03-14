@@ -80,10 +80,35 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
       })
       .sort({ date: -1 })
       .limit(req.params.size);
-    // console.log("Blog ", followingBlog);
+
+    let withUserDetailsBlog = [];
+    let commentUserDetailsBlog = [];
+    for (const iterator of followingBlog) {
+      const details = await UserDetails.find({
+        userid: iterator.userid,
+      });
+      withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+    }
+    for (const iterator of withUserDetailsBlog) {
+      let commentWithUserDetails = [];
+      for (const iteratorComment of iterator.comment) {
+        const details = await UserDetails.find({
+          userid: iteratorComment.commentUser,
+        });
+        commentWithUserDetails.push({
+          ...iteratorComment,
+          userDetails: details[0],
+        });
+      }
+      commentUserDetailsBlog.push({
+        ...iterator,
+        comment: commentWithUserDetails,
+      });
+    }
+
     res.status(200).json({
       success: true,
-      followingBlog: followingBlog,
+      followingBlog: commentUserDetailsBlog,
       msg: "Get Following Blog",
     });
   } catch (error) {
@@ -91,6 +116,30 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });
+
+// router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
+//   try {
+//     const details = await UserDetails.find({
+//       userid: req.userid,
+//     });
+//     const following = details[0].following;
+//     const followingBlog = await blog
+//       .find({
+//         userid: [...following, req.userid],
+//       })
+//       .sort({ date: -1 })
+//       .limit(req.params.size);
+//     // console.log("Blog ", followingBlog);
+//     res.status(200).json({
+//       success: true,
+//       followingBlog: followingBlog,
+//       msg: "Get Following Blog",
+//     });
+//   } catch (error) {
+//     // console.log("ERR ", error);
+//     res.status(400).json({ success: false, error: "Internel server error" });
+//   }
+// });
 
 router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
   try {
@@ -310,9 +359,18 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
           { new: true }
         );
         const comment = addCommentUser.comment;
+        let commentWithUserDetails = [];
+        for (const iterator of comment) {
+          const details = await UserDetails.find({
+            userid: iterator.commentUser,
+          });
+
+          commentWithUserDetails.push({ ...iterator, userDetails: details[0] });
+        }
+        // console.log("userID ", commentWithUserDetails);
         res.status(200).json({
           success: true,
-          comment: comment,
+          comment: commentWithUserDetails,
           msg: "Comment done",
         });
       } else {
@@ -434,9 +492,35 @@ router.post("/getfollowingfilterblog/:size", fetchuser, async (req, res) => {
       })
       .sort({ date: -1 })
       .limit(req.params.size);
+
+    let withUserDetailsBlog = [];
+    let commentUserDetailsBlog = [];
+    for (const iterator of followingFilterBlog) {
+      const details = await UserDetails.find({
+        userid: iterator.userid,
+      });
+      withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+    }
+    for (const iterator of withUserDetailsBlog) {
+      let commentWithUserDetails = [];
+      for (const iteratorComment of iterator.comment) {
+        const details = await UserDetails.find({
+          userid: iteratorComment.commentUser,
+        });
+        commentWithUserDetails.push({
+          ...iteratorComment,
+          userDetails: details[0],
+        });
+      }
+      commentUserDetailsBlog.push({
+        ...iterator,
+        comment: commentWithUserDetails,
+      });
+    }
+
     res.status(200).json({
       success: true,
-      followingFilterBlog: followingFilterBlog,
+      followingFilterBlog: commentUserDetailsBlog,
       msg: "Get Following Blog",
     });
   } catch (error) {

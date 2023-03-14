@@ -10,11 +10,14 @@ export default function Profile() {
   const contextBlog = useContext(context);
   const {
     user,
+    alluser,
     setFollowing,
     getClickUserBlog,
     getClickFollowerBe,
     getClickFollowingBe,
     clickUser,
+    setStateAllUsers,
+    setStateUserDetails,
   } = contextBlog;
   const [clickUserDetails, setClickUserDetails] = useState({});
   const [clickUserBlog, setClickUserBlog] = useState([]);
@@ -75,11 +78,11 @@ export default function Profile() {
   };
 
   const handleFollow = async (id) => {
-    console.log("id ", id);
     let userid = { id: id };
     setFollowing(userid);
 
-    let allUser = follow.length > 0 ? follow : [clickUserDetails];
+    // let allUser = follow.length > 0 ? follow : [clickUserDetails];
+    let allUser = follow.length > 0 ? follow : alluser;
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
       if (element.userid === id) {
@@ -108,7 +111,6 @@ export default function Profile() {
       const element = allUser[index];
       if (element.userid === user._id) {
         const include = element.following.includes(id);
-
         if (include === true) {
           let following = element.following.filter((d) => {
             return d !== id;
@@ -128,13 +130,16 @@ export default function Profile() {
         break;
       }
     }
-    if (allUser.length <= 1) {
-      console.log("user ", allUser);
-      if (allUser[0].userid === clickUserDetails.userid) {
-        console.log("user match ", allUser);
-        setClickUserDetails({ ...allUser[0] });
-      }
-    }
+
+    const filterClickUser = alluser.filter((data) => {
+      return data.userid === clickUserDetails.userid;
+    });
+    const filterCurrentUser = allUser.filter((data) => {
+      return data.userid === user._id;
+    });
+    setClickUserDetails({ ...filterClickUser[0] });
+    setStateAllUsers(allUser);
+    setStateUserDetails(filterCurrentUser);
     setFollow(allUser);
   };
 
