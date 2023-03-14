@@ -46,7 +46,7 @@ export default function Blogcard(props) {
     const blogUserID = {
       id: userid,
     };
-    setBlogUserDetails(await getBlogUserDetailsBe(blogUserID));
+    setBlogUserDetails([userDetails]);
     setCommentsValue(comment);
   };
 
