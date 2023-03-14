@@ -6,8 +6,15 @@ import UserDisplay from "./UserDisplay";
 
 export default function Navebar(props) {
   const alertContext = useContext(context);
-  const { showAlert, reset, loadAllUser, user, alluser, userDetails } =
-    alertContext;
+  const {
+    showAlert,
+    reset,
+    loadAllUser,
+    user,
+    alluser,
+    userDetails,
+    loadSearchUser,
+  } = alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
@@ -38,7 +45,10 @@ export default function Navebar(props) {
   const handleSearchOnChange = (e) => {
     setQuery(e.target.value);
   };
-  const handleSearchClick = () => {};
+  const handleSearchClick = async (e) => {
+    e.preventDefault();
+    await loadSearchUser(2, query);
+  };
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -97,7 +107,6 @@ export default function Navebar(props) {
                   width: "30vw",
                 }}
                 onChange={handleSearchOnChange}
-                onClick={handleSearchClick}
               />
 
               <div
@@ -147,6 +156,11 @@ export default function Navebar(props) {
                         })
                     : ""}
                 </div>
+              </div>
+              <div>
+                <button className="btn btn-success" onClick={handleSearchClick}>
+                  Search
+                </button>
               </div>
             </form>
 

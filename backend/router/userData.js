@@ -219,4 +219,18 @@ router.post("/getclickfollower", fetchuser, async (req, res) => {
   }
 });
 
+router.get("/getsearchuser/:size/:query", async (req, res) => {
+  try {
+    const details = await UserDetails.find({
+      $or: [
+        { firstName: req.params.query },
+        { lastName: req.params.query },
+        { "user.name": req.params.query },
+      ],
+    }).limit(req.params.size);
+    res.status(200).json({ success: true, details: details, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
 module.exports = router;

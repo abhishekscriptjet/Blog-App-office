@@ -69,6 +69,26 @@ function ContextBlog(props) {
       showAlert(res.error, "danger");
     }
   };
+  const loadSearchUser = async (size, query) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      `http://localhost:5000/user/getsearchuser/${size}/${query}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      const alluser = res.details;
+      console.log("ress ", alluser);
+      // setAllUser(res.details);
+      // showAlert(res.msg, "success");
+      return res.details;
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
 
   const deleteEndPoint = async (id) => {
     const user = localStorage.getItem("blogToken");
@@ -609,6 +629,7 @@ function ContextBlog(props) {
         alluser,
         userDetails,
         clickUser,
+        loadSearchUser,
         setStateAllUsersByProfileFollow,
         setStateAllUsers,
         setStateUserDetails,

@@ -1,6 +1,6 @@
 const express = require("express");
 const blog = require("../schema/blog");
-const { body, validationResult, Result, param } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const fetchuser = require("./fetchUser");
 const User = require("../schema/user");
 const UserDetails = require("../schema/userDetails");
