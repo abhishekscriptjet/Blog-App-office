@@ -104,6 +104,15 @@ router.get("/getuserdetails", fetchuser, async (req, res) => {
   }
 });
 
+router.get("/getclickuserdetails/:id", fetchuser, async (req, res) => {
+  try {
+    const details = await UserDetails.find({ userid: req.params.id });
+    res.status(200).json({ success: true, details: details, msg: "Loaded" });
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internel server error" });
+  }
+});
+
 router.get("/getalluser/:size", async (req, res) => {
   try {
     const details = await UserDetails.find().limit(req.params.size);

@@ -5,6 +5,7 @@ import context from "../contextAPI/context";
 import { useNavigate } from "react-router-dom";
 import UserDisplay from "./UserDisplay";
 import InfiniteScroll from "react-infinite-scroll-component";
+import loading from "../sources/loading.gif";
 
 export default function Home() {
   const clickEdit = useRef(null);
@@ -19,7 +20,6 @@ export default function Home() {
     userDetails,
     setFollowing,
     getFollowingBlog,
-    setClickUserDetails,
     getFollowingFilterBlog,
   } = contextBlog;
 
@@ -122,7 +122,7 @@ export default function Home() {
   };
 
   const handleClickOtherUser = async (data) => {
-    await setClickUserDetails(data, user);
+    localStorage.setItem("clickUserId", data.userid);
     navigate("./clickuser");
   };
 
@@ -192,7 +192,16 @@ export default function Home() {
             dataLength={allusers}
             next={fetchMoreUsers}
             hasMore={allusers.length >= userSize}
-            loader={<h4 className="text-center">Loading...</h4>}
+            loader={
+              <div className="text-center">
+                <img
+                  className="my-3"
+                  src={loading}
+                  alt="Loading"
+                  style={{ width: "30px", maxWidth: "30px" }}
+                />
+              </div>
+            }
             scrollableTarget="scrollableDivUser"
           >
             {allusers.length > 0
@@ -317,7 +326,16 @@ export default function Home() {
             dataLength={userBlog}
             next={fetchMore}
             hasMore={userBlog.length >= size}
-            loader={<h4 className="text-center">Loading...</h4>}
+            loader={
+              <div className="text-center">
+                <img
+                  className="my-3"
+                  src={loading}
+                  alt="Loading"
+                  style={{ width: "30px", maxWidth: "30px" }}
+                />
+              </div>
+            }
             scrollableTarget="scrollableDiv"
           >
             {userBlog === []

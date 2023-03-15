@@ -15,30 +15,27 @@ export default function Profile() {
     getClickUserBlog,
     getClickFollowerBe,
     getClickFollowingBe,
-    clickUser,
     setStateAllUsers,
     setStateUserDetails,
+    getClickUserDetails,
+    formatTime,
   } = contextBlog;
-  const [clickUserDetails, setClickUserDetails] = useState({});
+  const [clickUserDetails, setClickUserDetails] = useState([]);
   const [clickUserBlog, setClickUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
 
-  // console.log("Click User :", clickUser);
-
   const loadData = async () => {
+    const clickUserId = localStorage.getItem("clickUserId");
     const id = {
-      id: clickUser.userid,
+      id: clickUserId,
     };
-    setClickUserDetails(clickUser);
     setClickUserBlog(await getClickUserBlog(id));
+    setClickUserDetails(await getClickUserDetails(clickUserId));
   };
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
-      if (!clickUser.userid) {
-        navigate("../");
-      }
       loadData();
     } else {
       navigate("../login");
@@ -63,8 +60,9 @@ export default function Profile() {
 
   const handleFollowing = async (e) => {
     const btn = e.target.value;
+    const clickUserId = localStorage.getItem("clickUserId");
     const id = {
-      id: clickUser.userid,
+      id: clickUserId,
     };
     if (btn === "following") {
       setModelName("Following");
@@ -132,12 +130,12 @@ export default function Profile() {
     }
 
     const filterClickUser = alluser.filter((data) => {
-      return data.userid === clickUserDetails.userid;
+      return data.userid === clickUserDetails[0].userid;
     });
     const filterCurrentUser = allUser.filter((data) => {
       return data.userid === user._id;
     });
-    setClickUserDetails({ ...filterClickUser[0] });
+    setClickUserDetails(filterClickUser);
     setStateAllUsers(allUser);
     setStateUserDetails(filterCurrentUser);
     setFollow(allUser);
@@ -226,8 +224,8 @@ export default function Profile() {
                   >
                     <img
                       src={
-                        clickUserDetails
-                          ? clickUserDetails.profileImg
+                        clickUserDetails.length > 0
+                          ? clickUserDetails[0].profileImg
                           : UserIcon
                       }
                       alt="Generic placeholder"
@@ -245,10 +243,15 @@ export default function Profile() {
                       className="btn btn-primary"
                       data-mdb-ripple-color="dark"
                       style={{ zIndex: "1" }}
-                      onClick={() => handleFollow(clickUserDetails.userid)}
+                      disabled={
+                        clickUserDetails > 0
+                          ? clickUserDetails[0].userid === user._id
+                          : false
+                      }
+                      onClick={() => handleFollow(clickUserDetails[0].userid)}
                     >
-                      {clickUserDetails.follower
-                        ? clickUserDetails.follower.includes(user._id)
+                      {clickUserDetails.length > 0
+                        ? clickUserDetails[0].follower.includes(user._id)
                           ? "Following"
                           : "Follow"
                         : ""}
@@ -256,17 +259,17 @@ export default function Profile() {
                   </div>
                   <div className="ms-3" style={{ marginTop: "110px" }}>
                     <h5>
-                      {clickUserDetails
-                        ? `${capitaliz(clickUserDetails.firstName)} ${capitaliz(
-                            clickUserDetails.lastName
-                          )}`
+                      {clickUserDetails.length > 0
+                        ? `${capitaliz(
+                            clickUserDetails[0].firstName
+                          )} ${capitaliz(clickUserDetails[0].lastName)}`
                         : ""}
                     </h5>
                     <p className="">
-                      {clickUserDetails
-                        ? `${capitaliz(clickUserDetails.city)}, ${capitaliz(
-                            clickUserDetails.state
-                          )}, ${capitaliz(clickUserDetails.country)}.`
+                      {clickUserDetails.length > 0
+                        ? `${capitaliz(clickUserDetails[0].city)}, ${capitaliz(
+                            clickUserDetails[0].state
+                          )}, ${capitaliz(clickUserDetails[0].country)}.`
                         : ""}
                     </p>
                   </div>
@@ -284,8 +287,8 @@ export default function Profile() {
                     </div>
                     <div className="text-center  mx-5 mx-sm-4 mx-md-2 mx-lg-5 px-sm-0 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {clickUserDetails.follower
-                          ? clickUserDetails.follower.length
+                        {clickUserDetails.length > 0
+                          ? clickUserDetails[0].follower.length
                           : "0"}
                       </p>
                       <button
@@ -298,8 +301,8 @@ export default function Profile() {
                     </div>
                     <div className="text-center  mx-3 mx-sm-4 mx-md-2 mx-lg-5 px-sm-1 px-md-5 px-lg-5 my-1 my-sm-0">
                       <p className="mb-1 h5">
-                        {clickUserDetails.following
-                          ? clickUserDetails.following.length
+                        {clickUserDetails.length > 0
+                          ? clickUserDetails[0].following.length
                           : "0"}
                       </p>
                       <button
@@ -323,24 +326,32 @@ export default function Profile() {
                       style={{ backgroundColor: "rgb(229 230 231)" }}
                     >
                       <p className="font-italic mb-1">
-                        {clickUserDetails ? clickUserDetails.profession : ""}
+                        {clickUserDetails.length > 0
+                          ? clickUserDetails[0].profession
+                          : ""}
                       </p>
                       <p className="font-italic mb-1">
                         Lives in{" "}
-                        {clickUserDetails
-                          ? capitaliz(clickUserDetails.country)
+                        {clickUserDetails.length > 0
+                          ? capitaliz(clickUserDetails[0].country)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Gender </strong>
-                        {clickUserDetails
-                          ? capitaliz(clickUserDetails.gender)
+                        {clickUserDetails.length > 0
+                          ? capitaliz(clickUserDetails[0].gender)
                           : ""}
                       </p>
                       <p className="font-italic mb-0">
                         <strong>Birth Date </strong>
-                        {clickUserDetails
-                          ? capitaliz(clickUserDetails.dateOfBirth)
+                        {clickUserDetails.length > 0
+                          ? capitaliz(clickUserDetails[0].dateOfBirth)
+                          : ""}
+                      </p>
+                      <p className="font-italic mb-0">
+                        <strong>Since - </strong>
+                        {clickUserDetails.length > 0
+                          ? formatTime(clickUserDetails[0].user.date)
                           : ""}
                       </p>
                     </div>

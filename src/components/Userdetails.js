@@ -10,7 +10,7 @@ const Userdetails = (props) => {
   const navigate = useNavigate();
 
   const contextBlog = useContext(context);
-  const { createUserDetails, userDetails, getUserDetails, showAlert } =
+  const { createUserDetails, userDetails, showAlert, setStateUserDetails } =
     contextBlog;
 
   const [picture, setPicture] = useState(null);
@@ -869,6 +869,7 @@ const Userdetails = (props) => {
         profileImg: picture,
       };
       createUserDetails(details);
+      setStateUserDetails([details]);
       setIsSubmit(false);
       navigate("../profile");
     } else {
@@ -989,7 +990,6 @@ const Userdetails = (props) => {
   useEffect(() => {
     setCountry(countries);
     quotesAPI();
-    getUserDetails();
     setTimeout(() => {
       setDetails(1);
     }, 1000);
@@ -1004,7 +1004,7 @@ const Userdetails = (props) => {
     setFormError(validate(name));
   }, [name, picture]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setFormError(validate(name));
     saveState();
   };

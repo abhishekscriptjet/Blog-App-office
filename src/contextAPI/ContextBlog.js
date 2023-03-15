@@ -7,7 +7,6 @@ function ContextBlog(props) {
   const [user, setUser] = useState({});
   const [alluser, setAllUser] = useState([]);
   const [userDetails, setUserDetails] = useState([]);
-  const [clickUser, setClickUser] = useState({});
   const [login, setLogin] = useState("");
 
   const showAlert = (massage, type) => {
@@ -81,7 +80,6 @@ function ContextBlog(props) {
     const res = await response.json();
     if (res.success) {
       const alluser = res.details;
-      console.log("ress ", alluser);
       return res.details;
     } else {
       showAlert(res.error, "danger");
@@ -336,14 +334,25 @@ function ContextBlog(props) {
     showAlert(res.error, "danger");
   };
 
-  const setClickUserDetails = (data, user) => {
-    if (data._id) {
-      setClickUser(data);
-      setUser(user);
-      showAlert("Getting data", "success");
-    } else {
-      showAlert("There is same Error to loadding", "danger");
+  const getClickUserDetails = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    const response = await fetch(
+      `http://localhost:5000/user/getclickuserdetails/${id}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      if (res.details.length === 0) {
+        return false;
+      }
+      showAlert(res.msg, "success");
+      return res.details;
     }
+    showAlert(res.error, "danger");
+    return false;
   };
 
   const getClickUserBlog = async (id) => {
@@ -617,6 +626,17 @@ function ContextBlog(props) {
   const setStateAllUsersByProfileFollow = (data) => {
     setAllUser(data);
   };
+  const setStateAllUsersByNavSearch = (data) => {
+    let allusers = alluser;
+    for (let index = 0; index < allusers.length; index++) {
+      const element = allusers[index];
+      if (element.userid === data.userid) {
+        allusers[index] = data;
+        break;
+      }
+    }
+    setAllUser(allusers);
+  };
 
   return (
     <context.Provider
@@ -626,8 +646,9 @@ function ContextBlog(props) {
         user,
         alluser,
         userDetails,
-        clickUser,
+        setStateAllUsersByNavSearch,
         loadSearchUser,
+        getClickUserDetails,
         setStateAllUsersByProfileFollow,
         setStateAllUsers,
         setStateUserDetails,
@@ -652,7 +673,6 @@ function ContextBlog(props) {
         getBlogUserDetailsBe,
         setBlogCommentBe,
         getCommentUserDetailsBe,
-        setClickUserDetails,
         getClickUserBlog,
         getClickFollowerBe,
         getClickFollowingBe,

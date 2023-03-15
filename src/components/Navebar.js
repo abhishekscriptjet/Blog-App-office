@@ -3,15 +3,27 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import icon from "../sources/navicon.png";
 import context from "../contextAPI/context";
 import UserDisplay from "./UserDisplay";
+import InfiniteScroll from "react-infinite-scroll-component";
+import loading from "../sources/loading.gif";
 
 export default function Navebar(props) {
   const alertContext = useContext(context);
-  const { showAlert, reset, user, loadSearchUser } = alertContext;
+  const {
+    user,
+    reset,
+    showAlert,
+    setFollowing,
+    loadSearchUser,
+    setStateUserDetails,
+    setStateAllUsersByNavSearch,
+  } = alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
 
   const [alluser, setAlluser] = useState([]);
+  const [size, setSize] = useState(2);
+  const [query, setQuery] = useState("");
 
   const handleLogout = (e) => {
     localStorage.removeItem("blogToken");
@@ -32,14 +44,96 @@ export default function Navebar(props) {
   }, []);
 
   const handleSearchOnChange = async (e) => {
-    let query = e.target.value;
-    query = query.replace(/^\s+/gm, "");
+    let queryValue = e.target.value;
+    queryValue = queryValue.replace(/^\s+/gm, "");
+    setQuery(queryValue);
+    if (query && queryValue) {
+      setAlluser(await loadSearchUser(size, query));
+    } else {
+      setAlluser([]);
+      setSize(2);
+    }
+  };
+
+  const fetchMore = async () => {
     if (query) {
-      setAlluser(await loadSearchUser(10, query));
+      setAlluser(await loadSearchUser(size + 2, query));
+      setSize(size + 10);
     } else {
       setAlluser([]);
     }
   };
+
+  const handleClickOtherUser = async (data) => {
+    localStorage.setItem("clickUserId", data.userid);
+    navigate("./clickuser");
+  };
+
+  const handleFollow = async (id) => {
+    let userid = { id: id };
+    setFollowing(userid);
+    // setUserBlog(await getFollowingBlog(size));
+    // setUserBlog(await getFollowingBlog(size));
+
+    let allUser = alluser;
+    for (let index = 0; index < allUser.length; index++) {
+      const element = allUser[index];
+      if (element.userid === id) {
+        const include = element.follower.includes(user._id);
+        if (include === true) {
+          let follower = element.follower.filter((d) => {
+            return d !== user._id;
+          });
+          let updateduser = {
+            ...element,
+            follower: [...follower],
+          };
+          allUser[index] = updateduser;
+        } else {
+          let updateduser = {
+            ...element,
+            follower: [...element.follower, user._id],
+          };
+          allUser[index] = updateduser;
+        }
+        break;
+      }
+    }
+    for (let index = 0; index < allUser.length; index++) {
+      const element = allUser[index];
+      if (element.userid === user._id) {
+        const include = element.following.includes(id);
+
+        if (include === true) {
+          let following = element.following.filter((d) => {
+            return d !== id;
+          });
+          let updateduser = {
+            ...element,
+            following: [...following],
+          };
+          allUser[index] = updateduser;
+        } else {
+          let updateduser = {
+            ...element,
+            following: [...element.following, id],
+          };
+          allUser[index] = updateduser;
+        }
+        break;
+      }
+    }
+    const updatedUserDetails = allUser.filter((data) => {
+      return data.userid === user._id;
+    });
+    const details = allUser.filter((data) => {
+      return data.userid === id;
+    });
+    setStateAllUsersByNavSearch(details[0]);
+    setStateUserDetails(updatedUserDetails);
+    setAlluser(allUser);
+  };
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -110,6 +204,7 @@ export default function Navebar(props) {
                 }}
               >
                 <div
+                  id="scrollableDivSearch"
                   className="d-flex align-items-center flex-column  "
                   style={{
                     overflow: "auto",
@@ -118,20 +213,37 @@ export default function Navebar(props) {
                     borderRadius: "10px",
                   }}
                 >
-                  {alluser.length > 0
-                    ? alluser.map((alluser) => {
-                        return (
-                          <div key={alluser._id}>
-                            <UserDisplay
-                              alluser={alluser}
-                              user={user}
-                              // handleClickOtherUser={handleClickOtherUser}
-                              // handleFollow={handleFollow}
-                            />
-                          </div>
-                        );
-                      })
-                    : ""}
+                  <InfiniteScroll
+                    dataLength={alluser}
+                    next={fetchMore}
+                    hasMore={alluser.length >= size}
+                    loader={
+                      <div className="text-center">
+                        <img
+                          className="my-4"
+                          src={loading}
+                          alt="Loading"
+                          style={{ width: "30px", maxWidth: "30px" }}
+                        />
+                      </div>
+                    }
+                    scrollableTarget="scrollableDivSearch"
+                  >
+                    {alluser.length > 0
+                      ? alluser.map((alluser) => {
+                          return (
+                            <div key={alluser._id}>
+                              <UserDisplay
+                                alluser={alluser}
+                                user={user}
+                                handleClickOtherUser={handleClickOtherUser}
+                                handleFollow={handleFollow}
+                              />
+                            </div>
+                          );
+                        })
+                      : ""}
+                  </InfiniteScroll>
                 </div>
               </div>
             </form>
