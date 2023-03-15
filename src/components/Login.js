@@ -23,7 +23,9 @@ export default function Login() {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/auth/login", {
+    const networkOrigin = "http://192.168.29.30:5000";
+    const localOrigin = "http://localhost:5000";
+    const response = await fetch(`${networkOrigin || localOrigin}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),

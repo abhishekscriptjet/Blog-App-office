@@ -224,7 +224,7 @@ export default function Profile() {
                   style={{ backgroundColor: "rgb(60 60 60)", height: "200px" }}
                 >
                   <div
-                    className="ms-4 ms-sm-5 mt-3  mt-sm-5 d-flex flex-column"
+                    className="ms-4 ms-sm-5 mt-3 mt-sm-5 d-flex flex-column"
                     style={{ width: "150px" }}
                   >
                     <img

@@ -13,6 +13,7 @@ app.use(
 app.use(express.json());
 app.use((req, res, next) => {
   let origin = req.headers.origin;
+  // console.log("origin ", origin);
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.header(
     "Access-Control-Allow-headers",

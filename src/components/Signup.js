@@ -87,11 +87,21 @@ export default function Signup() {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     if (isSubmit) {
-      const response = await fetch("http://localhost:5000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
-      });
+      const networkOrigin = "http://192.168.29.30:5000";
+      const localOrigin = "http://localhost:5000";
+      // const response = await fetch("http://localhost:5000/auth/register", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(user),
+      // });
+      const response = await fetch(
+        `${networkOrigin || localOrigin}/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        }
+      );
       const json = await response.json();
       if (!json.success) {
         if (json.error) {

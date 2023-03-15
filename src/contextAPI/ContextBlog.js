@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import context from "./context";
 
 function ContextBlog(props) {
+  const networkOrigin = "http://192.168.29.30:5000";
+  const localOrigin = "http://localhost:5000";
   const [alert, setAlert] = useState(null);
   const [userBlog, setUserBlog] = useState([]);
   const [user, setUser] = useState({});
@@ -21,10 +23,14 @@ function ContextBlog(props) {
 
   const getUser = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/getuser", {
-      method: "GET",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
+    // const response = await fetch("http://localhost:5000/blog/getuser", {
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/getuser`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       setUser(res.user);
@@ -36,10 +42,14 @@ function ContextBlog(props) {
 
   const getUserBlogs = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/getuserblogs", {
-      method: "GET",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
+    // const response = await fetch("http://localhost:5000/blog/getuserblogs", {
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/getuserblogs`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -51,8 +61,10 @@ function ContextBlog(props) {
 
   const loadAllUser = async (size) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/user/getalluser/${size}`,
     const response = await fetch(
-      `http://localhost:5000/user/getalluser/${size}`,
+      `${networkOrigin || localOrigin}/user/getalluser/${size}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -70,8 +82,10 @@ function ContextBlog(props) {
   };
   const loadSearchUser = async (size, query) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/user/getsearchuser/${size}/${query}`,
     const response = await fetch(
-      `http://localhost:5000/user/getsearchuser/${size}/${query}`,
+      `${networkOrigin || localOrigin}/user/getsearchuser/${size}/${query}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -88,8 +102,10 @@ function ContextBlog(props) {
 
   const deleteEndPoint = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/blog/deleteblog/${id}`,
     const response = await fetch(
-      `http://localhost:5000/blog/deleteblog/${id}`,
+      `${networkOrigin || localOrigin}/blog/deleteblog/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -110,11 +126,19 @@ function ContextBlog(props) {
 
   const createBlog = async (blog) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/createblog", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(blog),
-    });
+    // const response = await fetch("http://localhost:5000/blog/createblog", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(blog),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/createblog`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(blog),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       setUserBlog([...userBlog, res.creatBlog]);
@@ -127,11 +151,19 @@ function ContextBlog(props) {
   const editBlog = async (blog) => {
     const user = localStorage.getItem("blogToken");
     const id = await blog._id;
-    const response = await fetch(`http://localhost:5000/blog/editblog/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(blog),
-    });
+    // const response = await fetch(`http://localhost:5000/blog/editblog/${id}`, {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(blog),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/editblog/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(blog),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       const blogArray = userBlog;
@@ -152,8 +184,16 @@ function ContextBlog(props) {
   const createUserDetails = async (details) => {
     const user = localStorage.getItem("blogToken");
 
+    // const response = await fetch(
+    //   "http://localhost:5000/user/createuserdetails",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(details),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/user/createuserdetails",
+      `${networkOrigin || localOrigin}/user/createuserdetails`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -172,10 +212,17 @@ function ContextBlog(props) {
 
   const getUserDetails = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/getuserdetails", {
-      method: "GET",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
+    // const response = await fetch("http://localhost:5000/user/getuserdetails", {
+    //   method: "GET",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/user/getuserdetails`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       if (res.details.length === 0) {
@@ -191,11 +238,19 @@ function ContextBlog(props) {
 
   const setFollowing = async (id) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/setfollowing", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(id),
-    });
+    // const response = await fetch("http://localhost:5000/user/setfollowing", {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(id),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/user/setfollowing`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -206,10 +261,17 @@ function ContextBlog(props) {
 
   const getFollowing = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/getfollowing", {
-      method: "GET",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
+    // const response = await fetch("http://localhost:5000/user/getfollowing", {
+    //   method: "GET",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/user/getfollowing`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -221,10 +283,17 @@ function ContextBlog(props) {
 
   const getFollower = async () => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/user/getfollower", {
-      method: "GET",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-    });
+    // const response = await fetch("http://localhost:5000/user/getfollower", {
+    //   method: "GET",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/user/getfollower`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -236,11 +305,19 @@ function ContextBlog(props) {
 
   const setLikebe = async (id) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/setlike", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(id),
-    });
+    // const response = await fetch("http://localhost:5000/blog/setlike", {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(id),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/setlike`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -251,11 +328,19 @@ function ContextBlog(props) {
 
   const setDisLikebe = async (id) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/setdislike", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(id),
-    });
+    // const response = await fetch("http://localhost:5000/blog/setdislike", {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(id),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/setdislike`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -266,8 +351,15 @@ function ContextBlog(props) {
 
   const getFollowingBlog = async (size) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/blog/getfollowingblog/${size}`,
+    //   {
+    //     method: "GET",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //   }
+    // );
     const response = await fetch(
-      `http://localhost:5000/blog/getfollowingblog/${size}`,
+      `${networkOrigin || localOrigin}/blog/getfollowingblog/${size}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -284,8 +376,16 @@ function ContextBlog(props) {
 
   const getBlogUserDetailsBe = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/user/getbloguserdetails",
+    //   {
+    //     method: "PUT",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/user/getbloguserdetails",
+      `${networkOrigin || localOrigin}/user/getbloguserdetails`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -302,11 +402,19 @@ function ContextBlog(props) {
 
   const setBlogCommentBe = async (id) => {
     const user = localStorage.getItem("blogToken");
-    const response = await fetch("http://localhost:5000/blog/setblogcomment", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "auth-token": user },
-      body: JSON.stringify(id),
-    });
+    // const response = await fetch("http://localhost:5000/blog/setblogcomment", {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json", "auth-token": user },
+    //   body: JSON.stringify(id),
+    // });
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/blog/setblogcomment`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "auth-token": user },
+        body: JSON.stringify(id),
+      }
+    );
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
@@ -318,8 +426,16 @@ function ContextBlog(props) {
 
   const getCommentUserDetailsBe = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/user/getbloguserdetails",
+    //   {
+    //     method: "PUT",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/user/getbloguserdetails",
+      `${networkOrigin || localOrigin}/user/getbloguserdetails`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -336,8 +452,15 @@ function ContextBlog(props) {
 
   const getClickUserDetails = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/user/getclickuserdetails/${id}`,
+    //   {
+    //     method: "GET",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //   }
+    // );
     const response = await fetch(
-      `http://localhost:5000/user/getclickuserdetails/${id}`,
+      `${networkOrigin || localOrigin}/user/getclickuserdetails/${id}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -357,8 +480,16 @@ function ContextBlog(props) {
 
   const getClickUserBlog = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/blog/getclickuserblog",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/blog/getclickuserblog",
+      `${networkOrigin || localOrigin}/blog/getclickuserblog`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -376,8 +507,16 @@ function ContextBlog(props) {
 
   const getClickFollowingBe = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/user/getclickfollowing",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/user/getclickfollowing",
+      `${networkOrigin || localOrigin}/user/getclickfollowing`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -395,8 +534,16 @@ function ContextBlog(props) {
 
   const getClickFollowerBe = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/user/getclickfollower",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/user/getclickfollower",
+      `${networkOrigin || localOrigin}/user/getclickfollower`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -414,8 +561,16 @@ function ContextBlog(props) {
 
   const getFollowingFilterBlog = async (data, size) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/blog/getfollowingfilterblog/${size}`,
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify({ topic: data }),
+    //   }
+    // );
     const response = await fetch(
-      `http://localhost:5000/blog/getfollowingfilterblog/${size}`,
+      `${networkOrigin || localOrigin}/blog/getfollowingfilterblog/${size}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "auth-token": user },
@@ -433,8 +588,16 @@ function ContextBlog(props) {
 
   const deleteBlogCommentBe = async (id) => {
     const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   "http://localhost:5000/blog/deleteblogcomment",
+    //   {
+    //     method: "PUT",
+    //     headers: { "Content-Type": "application/json", "auth-token": user },
+    //     body: JSON.stringify(id),
+    //   }
+    // );
     const response = await fetch(
-      "http://localhost:5000/blog/deleteblogcomment",
+      `${networkOrigin || localOrigin}/blog/deleteblogcomment`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json", "auth-token": user },
