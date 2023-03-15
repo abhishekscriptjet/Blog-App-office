@@ -82,8 +82,6 @@ function ContextBlog(props) {
     if (res.success) {
       const alluser = res.details;
       console.log("ress ", alluser);
-      // setAllUser(res.details);
-      // showAlert(res.msg, "success");
       return res.details;
     } else {
       showAlert(res.error, "danger");

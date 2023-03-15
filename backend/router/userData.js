@@ -25,9 +25,11 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
       profileImg,
     } = req.body;
 
+    // For Edit
     const userDetails = {
       userid: userId,
       user: user,
+      name: `${firstName} ${lastName}`,
       firstName: firstName,
       lastName: lastName,
       gender: gender,
@@ -42,10 +44,12 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
     };
 
     if (user) {
+      //For Create
       if (details === null) {
         const userDetails = new UserDetails({
           userid: userId,
           user: user,
+          name: `${firstName} ${lastName}`,
           firstName: firstName,
           lastName: lastName,
           gender: gender,
@@ -223,9 +227,22 @@ router.get("/getsearchuser/:size/:query", async (req, res) => {
   try {
     const details = await UserDetails.find({
       $or: [
-        { firstName: req.params.query },
-        { lastName: req.params.query },
-        { "user.name": req.params.query },
+        {
+          firstName: {
+            $regex: new RegExp("^" + req.params.query.toLowerCase(), "i"),
+          },
+        },
+        {
+          lastName: {
+            $regex: new RegExp("^" + req.params.query.toLowerCase(), "i"),
+          },
+        },
+        {
+          name: {
+            $regex: new RegExp("^" + req.params.query.toLowerCase(), "i"),
+          },
+        },
+        { "user.name": { $regex: req.params.query } },
       ],
     }).limit(req.params.size);
     res.status(200).json({ success: true, details: details, msg: "Loaded" });

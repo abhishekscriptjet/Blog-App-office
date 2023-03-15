@@ -13,6 +13,10 @@ const userDetailsSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  name: {
+    type: String,
+    required: true,
+  },
   dateOfBirth: {
     type: String,
     required: true,

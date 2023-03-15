@@ -6,21 +6,12 @@ import UserDisplay from "./UserDisplay";
 
 export default function Navebar(props) {
   const alertContext = useContext(context);
-  const {
-    showAlert,
-    reset,
-    loadAllUser,
-    user,
-    alluser,
-    userDetails,
-    loadSearchUser,
-  } = alertContext;
+  const { showAlert, reset, user, loadSearchUser } = alertContext;
 
   const navigate = useNavigate();
   let location = useLocation();
 
-  const [query, setQuery] = useState("");
-  // const [alluser, setAlluser] = useState([]);
+  const [alluser, setAlluser] = useState([]);
 
   const handleLogout = (e) => {
     localStorage.removeItem("blogToken");
@@ -28,9 +19,9 @@ export default function Navebar(props) {
     showAlert("Logout Successfully.", "success");
     navigate("/login");
   };
-  const loadData = async () => {
-    // setAlluser(await loadAllUser());
-  };
+
+  const loadData = async () => {};
+
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
       loadData();
@@ -40,14 +31,14 @@ export default function Navebar(props) {
     //eslint-disable-next-line
   }, []);
 
-  // console.log("search ", query);
-
-  const handleSearchOnChange = (e) => {
-    setQuery(e.target.value);
-  };
-  const handleSearchClick = async (e) => {
-    e.preventDefault();
-    await loadSearchUser(2, query);
+  const handleSearchOnChange = async (e) => {
+    let query = e.target.value;
+    query = query.replace(/^\s+/gm, "");
+    if (query) {
+      setAlluser(await loadSearchUser(10, query));
+    } else {
+      setAlluser([]);
+    }
   };
   return (
     <div>
@@ -128,39 +119,20 @@ export default function Navebar(props) {
                   }}
                 >
                   {alluser.length > 0
-                    ? alluser
-                        .filter((users) => {
-                          return (
-                            users.firstName
-                              .toLowerCase()
-                              .includes(query.toLocaleLowerCase()) ||
-                            users.lastName
-                              .toLowerCase()
-                              .includes(query.toLocaleLowerCase()) ||
-                            users.user.name
-                              .toLowerCase()
-                              .includes(query.toLocaleLowerCase())
-                          );
-                        })
-                        .map((alluser) => {
-                          return (
-                            <div key={alluser._id}>
-                              <UserDisplay
-                                alluser={alluser}
-                                user={user}
-                                // handleClickOtherUser={handleClickOtherUser}
-                                // handleFollow={handleFollow}
-                              />
-                            </div>
-                          );
-                        })
+                    ? alluser.map((alluser) => {
+                        return (
+                          <div key={alluser._id}>
+                            <UserDisplay
+                              alluser={alluser}
+                              user={user}
+                              // handleClickOtherUser={handleClickOtherUser}
+                              // handleFollow={handleFollow}
+                            />
+                          </div>
+                        );
+                      })
                     : ""}
                 </div>
-              </div>
-              <div>
-                <button className="btn btn-success" onClick={handleSearchClick}>
-                  Search
-                </button>
               </div>
             </form>
 
