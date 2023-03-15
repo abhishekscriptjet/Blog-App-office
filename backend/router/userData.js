@@ -233,4 +233,5 @@ router.get("/getsearchuser/:size/:query", async (req, res) => {
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });
+
 module.exports = router;
