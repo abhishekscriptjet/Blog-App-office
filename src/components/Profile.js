@@ -3,7 +3,6 @@ import context from "../contextAPI/context";
 import { Link, useNavigate } from "react-router-dom";
 import UserIcon from "../sources/user.png";
 import UserDisplay from "./UserDisplay";
-import Userdetails from "./Userdetails";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -24,12 +23,14 @@ export default function Profile() {
   const [userBlog, setUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
-  const [userDetail, setUserDetail] = useState(userDetails);
+  const [userDetail, setUserDetail] = useState([]);
   // const [timeOut, setTimeOut] = useState(false);
 
   const loadData = async () => {
     setUserBlog(await getUserBlogs());
+    setUserDetail(userDetails);
   };
+  // console.log("userDetails ", userDetails);
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {
@@ -217,7 +218,7 @@ export default function Profile() {
       <section className="h-100 gradient-custom-2 w-100" style={{}}>
         <div className=" py-0 h-100 w-100">
           <div className="row d-flex justify-content-center align-items-center h-100">
-            <div className="col col-lg-12 col-xl-12">
+            <div className="col col-lg-12 col-xl-12 m-0 p-0">
               <div className="card border-0">
                 <div
                   className="rounded-top text-white d-flex"
@@ -399,7 +400,7 @@ export default function Profile() {
                         );
                       })
                     ) : (
-                      <div className="fs-2 text-center text-muted">
+                      <div className="fs-2 text-center text-muted my-2">
                         Create new Blog...
                       </div>
                     )}

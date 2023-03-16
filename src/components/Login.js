@@ -23,7 +23,7 @@ export default function Login() {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    const networkOrigin = "http://192.168.29.30:5000";
+    const networkOrigin = "http://192.168.29.49:5000";
     const localOrigin = "http://localhost:5000";
     const response = await fetch(`${networkOrigin || localOrigin}/auth/login`, {
       method: "POST",
@@ -43,11 +43,11 @@ export default function Login() {
       showAlert("Login Successfully.", "success");
       const oldUser = await getUserDetails();
       if (oldUser) {
+        await setLoginFunc();
         navigate("/");
-        await setLoginFunc();
       } else {
-        navigate("/userdetails");
         await setLoginFunc();
+        navigate("/userdetails");
       }
     }
   };

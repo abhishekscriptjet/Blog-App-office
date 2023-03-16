@@ -14,8 +14,8 @@ import ContextBlog from "./contextAPI/ContextBlog";
 function App() {
   return (
     <div>
-      <ContextBlog>
-        <Router>
+      <Router>
+        <ContextBlog>
           <div className="fixed-top">
             <Navebar />
             <Alert />
@@ -33,8 +33,8 @@ function App() {
           <div className="" style={{}}>
             <Footer />
           </div>
-        </Router>
-      </ContextBlog>
+        </ContextBlog>
+      </Router>
     </div>
   );
 }

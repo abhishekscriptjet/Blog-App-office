@@ -10,8 +10,13 @@ const Userdetails = (props) => {
   const navigate = useNavigate();
 
   const contextBlog = useContext(context);
-  const { createUserDetails, userDetails, showAlert, setStateUserDetails } =
-    contextBlog;
+  const {
+    createUserDetails,
+    userDetails,
+    showAlert,
+    setStateUserDetails,
+    deleteUserDetails,
+  } = contextBlog;
 
   const [picture, setPicture] = useState(null);
 
@@ -868,10 +873,18 @@ const Userdetails = (props) => {
         ...name,
         profileImg: picture,
       };
-      createUserDetails(details);
-      setStateUserDetails([details]);
-      setIsSubmit(false);
-      navigate("../profile");
+      if (name.follower) {
+        createUserDetails(details);
+        setStateUserDetails([details]);
+        setIsSubmit(false);
+        navigate("../profile");
+        console.log("if");
+      } else {
+        createUserDetails(details);
+        setIsSubmit(false);
+        navigate("../profile");
+        console.log("else ");
+      }
     } else {
       showAlert("Invelid given data.", "danger");
     }
@@ -1056,6 +1069,15 @@ const Userdetails = (props) => {
     let id = e.target.value;
     let city = { ...name, city: id };
     setName(city);
+  };
+
+  const handleDelete = async () => {
+    if ((name, picture)) {
+      await deleteUserDetails();
+      clearData();
+    } else {
+      showAlert("Details already deleted", "danger");
+    }
   };
 
   return (
@@ -1363,6 +1385,13 @@ const Userdetails = (props) => {
                   onClick={handleSubmit}
                 >
                   Submit
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger col"
+                  onClick={handleDelete}
+                >
+                  Delete
                 </button>
               </div>
             </form>

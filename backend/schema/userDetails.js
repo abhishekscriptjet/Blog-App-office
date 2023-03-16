@@ -69,7 +69,7 @@ const userDetailsSchema = mongoose.Schema({
   },
   userDetailsDate: {
     type: Date,
-    default: new Date(),
+    require: true,
   },
 });
 

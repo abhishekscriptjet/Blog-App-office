@@ -29,6 +29,7 @@ router.post(
           comment: [],
           upVote: [],
           downVote: [],
+          date: new Date(),
         });
         const creatBlog = await blogs.save();
         // Add Blog count in userDetails
@@ -73,6 +74,14 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
     const details = await UserDetails.find({
       userid: req.userid,
     });
+    if (!details[0]) {
+      return res.status(400).json({
+        success: false,
+        followingBlog: [],
+        navigate: true,
+        error: "Please fill details",
+      });
+    }
     const following = details[0].following;
     const followingBlog = await blog
       .find({

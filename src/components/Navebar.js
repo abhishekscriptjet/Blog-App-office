@@ -195,17 +195,17 @@ export default function Navebar(props) {
               />
 
               <div
-                className="dropdown-menu text-center"
+                className="dropdown-menu text-center p-0 shadow-lg mb-5 bg-body"
                 aria-labelledby="dropdownMenu2"
                 style={{
                   width: "100%",
-                  height: "50vh",
+                  height: "45vh",
                   borderRadius: "10px",
                 }}
               >
                 <div
                   id="scrollableDivSearch"
-                  className="d-flex align-items-center flex-column  "
+                  className="d-flex align-items-center flex-column"
                   style={{
                     overflow: "auto",
                     width: "100%",
@@ -214,6 +214,7 @@ export default function Navebar(props) {
                   }}
                 >
                   <InfiniteScroll
+                    className="mx-3"
                     dataLength={alluser}
                     next={fetchMore}
                     hasMore={alluser.length >= size}
@@ -232,7 +233,7 @@ export default function Navebar(props) {
                     {alluser.length > 0
                       ? alluser.map((alluser) => {
                           return (
-                            <div key={alluser._id}>
+                            <div key={alluser._id} className="">
                               <UserDisplay
                                 alluser={alluser}
                                 user={user}

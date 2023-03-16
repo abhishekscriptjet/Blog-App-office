@@ -22,7 +22,7 @@ const blogSchema = mongoose.Schema({
   },
   date: {
     type: Date,
-    default: new Date(),
+    require: true,
   },
   upVote: {
     type: Array,

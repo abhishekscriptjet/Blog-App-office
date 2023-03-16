@@ -29,6 +29,7 @@ export default function Home() {
   const [size, setSize] = useState(10);
   const [userSize, setUserSize] = useState(10);
   const [filter, setFilter] = useState("all");
+  const [refresh, setRefresh] = useState(false);
 
   const saveToServer = async () => {
     setUserBlog(await getFollowingBlog(size));
@@ -40,6 +41,9 @@ export default function Home() {
 
   const loadData = async () => {
     setUserBlog(await getFollowingBlog(size));
+    setTimeout(() => {
+      setRefresh(true);
+    }, 500);
   };
 
   useEffect(() => {
@@ -53,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     setAllusers(alluser);
-  }, [userBlog]);
+  }, [refresh]);
 
   const handleEditClick = (blog) => {
     clickEdit.current.click();
@@ -178,7 +182,7 @@ export default function Home() {
         style={{
           borderRadius: "10px",
           height: "100vh",
-          width: "100%",
+          width: "70%",
           marginTop: "30px",
           marginBottom: "30px",
         }}
@@ -230,6 +234,7 @@ export default function Home() {
         className="pb-2 shadow-lg d-flex flex-column align-items-center"
         style={{
           height: "100vh",
+          width: "100%",
           marginTop: "30px",
           marginBottom: "30px",
           borderRadius: "10px",
@@ -328,52 +333,36 @@ export default function Home() {
             next={fetchMore}
             hasMore={userBlog.length >= size}
             loader={
-              // <div className="text-center">
-              //   <img
-              //     className="my-3"
-              //     src={loading}
-              //     alt="Loading"
-              //     style={{ width: "30px", maxWidth: "30px" }}
-              //   />
-              // </div>
-              <Blogcard
-                blog={{
-                  topic: "",
-                  description: "",
-                  src: "",
-                  _id: "",
-                  upVote: "",
-                  downVote: "",
-                  userid: "",
-                  comment: "",
-                  date: "",
-                  userDetails: "",
-                }}
-              />
+              <div className="text-center">
+                <img
+                  className="my-3"
+                  src={loading}
+                  alt="Loading"
+                  style={{ width: "30px", maxWidth: "30px" }}
+                />
+              </div>
             }
             scrollableTarget="scrollableDiv"
           >
-            {userBlog === [] ? (
-              <Blogcard />
-            ) : (
-              userBlog.map((blog) => {
-                return (
-                  <div
-                    key={blog._id}
-                    className="mb-4"
-                    // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
-                  >
-                    <Blogcard
-                      blog={blog}
-                      user={user}
-                      handleClickOtherUser={handleClickOtherUser}
-                      saveToServer={saveToServer}
-                      handleEditClick={handleEditClick}
-                    />
-                  </div>
-                );
-              })
-            )}
+            {userBlog === []
+              ? "Please create blog"
+              : userBlog.map((blog) => {
+                  return (
+                    <div
+                      key={blog._id}
+                      className="mb-4"
+                      // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
+                    >
+                      <Blogcard
+                        blog={blog}
+                        user={user}
+                        handleClickOtherUser={handleClickOtherUser}
+                        saveToServer={saveToServer}
+                        handleEditClick={handleEditClick}
+                      />
+                    </div>
+                  );
+                })}
           </InfiniteScroll>
         </div>
       </div>

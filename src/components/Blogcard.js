@@ -52,7 +52,6 @@ export default function Blogcard(props) {
     setBlogUserDetails([userDetails]);
     setCommentsValue(comment);
   };
-  console.log(blogUserDetails);
 
   useEffect(() => {
     loadData();
@@ -238,7 +237,7 @@ export default function Blogcard(props) {
           src={src}
           className="card-img-top rounded-0"
           alt="..."
-          style={{ width: "", height: "50%" }}
+          style={{ width: "100%", height: "50%" }}
         />
         <div className="card-body">
           <h5 className="card-title">{topic}</h5>

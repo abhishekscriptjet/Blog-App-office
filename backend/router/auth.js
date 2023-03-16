@@ -39,6 +39,7 @@ router.post(
             email: email,
             password: hashPassword,
             phone: phone,
+            date: new Date(),
           }).then(res.status(200).json({ success: true }));
         } else {
           res

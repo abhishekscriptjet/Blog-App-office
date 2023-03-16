@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import context from "./context";
 
 function ContextBlog(props) {
-  const networkOrigin = "http://192.168.29.30:5000";
+  const navigate = useNavigate();
+  const networkOrigin = "http://192.168.29.49:5000";
   const localOrigin = "http://localhost:5000";
   const [alert, setAlert] = useState(null);
   const [userBlog, setUserBlog] = useState([]);
@@ -119,6 +121,30 @@ function ContextBlog(props) {
       const deletedBlog = userBlog.filter((blog) => blog._id !== id);
       setUserBlog(deletedBlog);
       showAlert("Blog deleted Successfully.", "success");
+    } else {
+      showAlert(res.error, "danger");
+    }
+  };
+
+  const deleteUserDetails = async (id) => {
+    const user = localStorage.getItem("blogToken");
+    // const response = await fetch(
+    //   `http://localhost:5000/blog/deleteblog/${id}`,
+    const response = await fetch(
+      `${networkOrigin || localOrigin}/user/deleteuserdetails`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": user,
+        },
+      }
+    );
+    const res = await response.json();
+    if (res.success) {
+      const deletedBlog = userBlog.filter((blog) => blog._id !== id);
+      setUserDetails([]);
+      showAlert(res.msg, "success");
     } else {
       showAlert(res.error, "danger");
     }
@@ -371,6 +397,9 @@ function ContextBlog(props) {
       return res.followingBlog;
     } else {
       showAlert(res.error, "danger");
+      if (res.navigate) {
+        navigate("./userdetails");
+      }
     }
   };
 
@@ -809,6 +838,7 @@ function ContextBlog(props) {
         user,
         alluser,
         userDetails,
+        deleteUserDetails,
         setStateAllUsersByNavSearch,
         loadSearchUser,
         getClickUserDetails,
