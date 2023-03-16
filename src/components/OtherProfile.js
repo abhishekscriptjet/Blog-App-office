@@ -244,7 +244,7 @@ export default function Profile() {
                       data-mdb-ripple-color="dark"
                       style={{ zIndex: "1" }}
                       disabled={
-                        clickUserDetails > 0
+                        clickUserDetails.length > 0
                           ? clickUserDetails[0].userid === user._id
                           : false
                       }

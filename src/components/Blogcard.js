@@ -4,7 +4,7 @@ import UserIcon from "../sources/user.png";
 import CommentsSection from "./CommentsSection";
 
 export default function Blogcard(props) {
-  const user = props.user;
+  const { user, handleClickOtherUser } = props;
   const {
     topic,
     description,
@@ -52,6 +52,7 @@ export default function Blogcard(props) {
     setBlogUserDetails([userDetails]);
     setCommentsValue(comment);
   };
+  console.log(blogUserDetails);
 
   useEffect(() => {
     loadData();
@@ -165,34 +166,40 @@ export default function Blogcard(props) {
     <div
       className="card"
       style={{
-        width: "35rem",
+        width: "inherit",
         backgroundColor: "inherit",
         borderRadius: "10px",
       }}
     >
       <div className="d-flex justify-content-left align-items-center mx-3 my-1">
-        <img
-          src={
-            blogUserDetails.length > 0
-              ? blogUserDetails[0].profileImg
+        <div
+          className="d-flex align-items-center"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleClickOtherUser(blogUserDetails[0])}
+        >
+          <img
+            src={
+              blogUserDetails.length > 0
                 ? blogUserDetails[0].profileImg
+                  ? blogUserDetails[0].profileImg
+                  : UserIcon
                 : UserIcon
-              : UserIcon
-          }
-          className="rounded-circle"
-          alt=""
-          width="25"
-          style={{
-            height: "30px",
-            width: "30px",
-            maxHeight: "30px",
-            maxWidth: "30px",
-            objectFit: "cover",
-          }}
-        />
-        <p className="text-muted p-2 m-0 ms-2">
-          {blogUserDetails.length > 0 ? blogUserDetails[0].user.name : ""}
-        </p>
+            }
+            className="rounded-circle"
+            alt=""
+            width="25"
+            style={{
+              height: "30px",
+              width: "30px",
+              maxHeight: "30px",
+              maxWidth: "30px",
+              objectFit: "cover",
+            }}
+          />
+          <p className="text-muted p-2 m-0 ms-2">
+            {blogUserDetails.length > 0 ? blogUserDetails[0].user.name : ""}
+          </p>
+        </div>
         <div className="drodown ms-auto">
           <i
             className="fa-solid fa-ellipsis p-2 btn "
@@ -229,9 +236,9 @@ export default function Blogcard(props) {
       <div className="card-body p-0">
         <img
           src={src}
-          className="card-img-top"
+          className="card-img-top rounded-0"
           alt="..."
-          style={{ width: "inharite", height: "30rem" }}
+          style={{ width: "", height: "50%" }}
         />
         <div className="card-body">
           <h5 className="card-title">{topic}</h5>

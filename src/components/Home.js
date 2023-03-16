@@ -178,6 +178,7 @@ export default function Home() {
         style={{
           borderRadius: "10px",
           height: "100vh",
+          width: "100%",
           marginTop: "30px",
           marginBottom: "30px",
         }}
@@ -226,7 +227,7 @@ export default function Home() {
         </div>
       </div>
       <div
-        className="pb-2 shadow-lg"
+        className="pb-2 shadow-lg d-flex flex-column align-items-center"
         style={{
           height: "100vh",
           marginTop: "30px",
@@ -319,7 +320,7 @@ export default function Home() {
         </div>
         <div
           id="scrollableDiv"
-          className="container my-3 px-5"
+          className="my-3 px-4"
           style={{ height: "80vh", overflow: "auto", borderRadius: "10px" }}
         >
           <InfiniteScroll
@@ -327,35 +328,52 @@ export default function Home() {
             next={fetchMore}
             hasMore={userBlog.length >= size}
             loader={
-              <div className="text-center">
-                <img
-                  className="my-3"
-                  src={loading}
-                  alt="Loading"
-                  style={{ width: "30px", maxWidth: "30px" }}
-                />
-              </div>
+              // <div className="text-center">
+              //   <img
+              //     className="my-3"
+              //     src={loading}
+              //     alt="Loading"
+              //     style={{ width: "30px", maxWidth: "30px" }}
+              //   />
+              // </div>
+              <Blogcard
+                blog={{
+                  topic: "",
+                  description: "",
+                  src: "",
+                  _id: "",
+                  upVote: "",
+                  downVote: "",
+                  userid: "",
+                  comment: "",
+                  date: "",
+                  userDetails: "",
+                }}
+              />
             }
             scrollableTarget="scrollableDiv"
           >
-            {userBlog === []
-              ? "Please create blog"
-              : userBlog.map((blog) => {
-                  return (
-                    <div
-                      key={blog._id}
-                      className="mb-4"
-                      // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
-                    >
-                      <Blogcard
-                        blog={blog}
-                        user={user}
-                        saveToServer={saveToServer}
-                        handleEditClick={handleEditClick}
-                      />
-                    </div>
-                  );
-                })}
+            {userBlog === [] ? (
+              <Blogcard />
+            ) : (
+              userBlog.map((blog) => {
+                return (
+                  <div
+                    key={blog._id}
+                    className="mb-4"
+                    // className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6 my-3"
+                  >
+                    <Blogcard
+                      blog={blog}
+                      user={user}
+                      handleClickOtherUser={handleClickOtherUser}
+                      saveToServer={saveToServer}
+                      handleEditClick={handleEditClick}
+                    />
+                  </div>
+                );
+              })
+            )}
           </InfiniteScroll>
         </div>
       </div>
