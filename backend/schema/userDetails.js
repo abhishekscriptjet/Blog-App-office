@@ -63,6 +63,9 @@ const userDetailsSchema = mongoose.Schema({
   disLikedBlog: {
     type: Array,
   },
+  commentBlog: {
+    type: Array,
+  },
   userid: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "userid",

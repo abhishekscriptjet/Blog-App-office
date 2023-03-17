@@ -159,6 +159,33 @@ router.delete("/deleteblog/:id", fetchuser, async (req, res) => {
     if (getblog.userid.toString() !== req.userid) {
       return res.status(400).json({ success: false, error: "Not Allowed" });
     }
+    let like = getblog.upVote;
+    like.map(async (id) => {
+      const likeUserDetails = await UserDetails.findOneAndUpdate(
+        { userid: id },
+        { $pull: { likedBlog: req.params.id } },
+        { new: true }
+      );
+    });
+
+    let disLike = getblog.downVote;
+    disLike.map(async (id) => {
+      const disLikeUserDetails = await UserDetails.findOneAndUpdate(
+        { userid: id },
+        { $pull: { disLikedBlog: req.params.id } },
+        { new: true }
+      );
+    });
+
+    let comment = getblog.comment;
+    comment.map(async (comment) => {
+      const commentUserDetails = await UserDetails.findOneAndUpdate(
+        { userid: comment.commentUser },
+        { $pull: { commentBlog: req.params.id } },
+        { new: true }
+      );
+    });
+
     const deleteblog = await blog.findByIdAndRemove(req.params.id);
 
     // Update Blog count in userDetails
@@ -352,6 +379,14 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
         _id: blogID,
         "comment.commentUser": userId,
       });
+      const getUserDetails = await UserDetails.findOne({ userid: userId });
+      if (getUserDetails.commentBlog.include(blogID)) {
+        const updateUserDetails = await UserDetails.findOneAndUpdate(
+          { userid: userId },
+          { $push: { commentBlog: blogID } },
+          { new: true }
+        );
+      }
       if (!find) {
         const addCommentUser = await blog.findOneAndUpdate(
           {
@@ -427,6 +462,11 @@ router.put("/deleteblogcomment", fetchuser, async (req, res) => {
     const blogID = req.body.blogId;
     const blogs = await blog.findOne({ _id: blogID });
     if (blogs) {
+      const userDetails = await UserDetails.findOneAndUpdate(
+        { userid: userId },
+        { $pull: { commentBlog: blogID } },
+        { new: true }
+      );
       const query = { _id: blogID };
       const updateDocument = {
         $pull: {
