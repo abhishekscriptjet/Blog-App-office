@@ -96,13 +96,35 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
   }
 });
 
+// router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
+//   try {
+//     const data = await UserDetails.findOne({ userid: req.userid });
+//     if (data) {
+//       const details = await UserDetails.findByIdAndRemove(data._id);
+//       res.status(200).json({ success: true, msg: "Details Deleted" });
+//     } else {
+//       res.status(400).json({ success: false, error: "Not found" });
+//     }
+//   } catch (error) {
+//     res.status(400).json({ success: false, error: "Internel server error" });
+//   }
+// });
+
 router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
   try {
     const data = await UserDetails.findOne({ userid: req.userid });
     if (data) {
-      const details = await UserDetails.findByIdAndRemove(data._id);
+      // const details = await UserDetails.findByIdAndRemove(data._id);
+      data.follower.map(async (flwr) => {
+        const followerUserDetails = await UserDetails.findOne({ userid: flwr });
+        if (followerUserDetails.following.includes(req.userid)) {
+          const details = await UserDetails.findOneAndUpdate(
+            { userid: flwr },
+            { $pull: { following: req.userid } }
+          );
+        }
+      });
       res.status(200).json({ success: true, msg: "Details Deleted" });
-      // console.log("data", data);
     } else {
       res.status(400).json({ success: false, error: "Not found" });
     }
