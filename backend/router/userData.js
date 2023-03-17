@@ -176,6 +176,42 @@ router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
         });
       });
 
+      const userBlog = await blog.find({ userid: req.userid });
+      if (userBlog.length > 0) {
+        userBlog.map((blg) => {
+          if (blg.userid === req.userid) {
+            const blogID = blg._id;
+
+            let like = blg.upVote;
+            like.map(async (id) => {
+              const likeUserDetails = await UserDetails.findOneAndUpdate(
+                { userid: id },
+                { $pull: { likedBlog: blogID } },
+                { new: true }
+              );
+            });
+
+            let disLike = blg.downVote;
+            disLike.map(async (id) => {
+              const disLikeUserDetails = await UserDetails.findOneAndUpdate(
+                { userid: id },
+                { $pull: { disLikedBlog: blogID } },
+                { new: true }
+              );
+            });
+
+            let comment = blg.comment;
+            comment.map(async (comment) => {
+              const commentUserDetails = await UserDetails.findOneAndUpdate(
+                { userid: comment.commentUser },
+                { $pull: { commentBlog: blogID } },
+                { new: true }
+              );
+            });
+          }
+        });
+      }
+
       res.status(200).json({ success: true, msg: "Details Deleted" });
     } else {
       res.status(400).json({ success: false, error: "Not found" });
