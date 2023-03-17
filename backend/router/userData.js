@@ -118,12 +118,64 @@ router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
       data.follower.map(async (flwr) => {
         const followerUserDetails = await UserDetails.findOne({ userid: flwr });
         if (followerUserDetails.following.includes(req.userid)) {
+          console.log("following remove");
           const details = await UserDetails.findOneAndUpdate(
             { userid: flwr },
             { $pull: { following: req.userid } }
           );
         }
       });
+
+      data.following.map(async (flwg) => {
+        const followingUserDetails = await UserDetails.findOne({
+          userid: flwg,
+        });
+        if (followingUserDetails.follower.includes(req.userid)) {
+          console.log("follower remove");
+          const details = await UserDetails.findOneAndUpdate(
+            { userid: flwg },
+            { $pull: { follower: req.userid } }
+          );
+        }
+      });
+
+      data.likedBlog.map(async (blg) => {
+        const likedBlogDetails = await blog.findOne({ _id: blg });
+        if (likedBlogDetails.upVote.includes(req.userid)) {
+          console.log("upVote remove");
+          const details = await blog.findOneAndUpdate(
+            { _id: blg },
+            { $pull: { upVote: req.userid } }
+          );
+        }
+      });
+
+      data.disLikedBlog.map(async (blg) => {
+        const disLikedBlogDetails = await blog.findOne({ _id: blg });
+        if (disLikedBlogDetails.downVote.includes(req.userid)) {
+          console.log("downVote remove");
+          const details = await blog.findOneAndUpdate(
+            { _id: blg },
+            { $pull: { downVote: req.userid } }
+          );
+        }
+      });
+
+      data.commentBlog.map(async (blg) => {
+        const disLikedBlogDetails = await blog.findOne({ _id: blg });
+        disLikedBlogDetails.comment.map(async (cmt) => {
+          if (cmt.commetUser.includes(req.userid)) {
+            console.log("downVote remove");
+            const details = await blog.findOneAndUpdate(
+              { _id: blg },
+              { $pull: { comment: { commetUser: req.userid } } },
+              false, // Upsert
+              true // Multi
+            );
+          }
+        });
+      });
+
       res.status(200).json({ success: true, msg: "Details Deleted" });
     } else {
       res.status(400).json({ success: false, error: "Not found" });

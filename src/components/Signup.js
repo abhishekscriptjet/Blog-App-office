@@ -87,7 +87,7 @@ export default function Signup() {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     if (isSubmit) {
-      const networkOrigin = "http://192.168.43.146:5000";
+      const networkOrigin = "http://192.168.29.49:5000";
       const localOrigin = "http://localhost:5000";
       // const response = await fetch("http://localhost:5000/auth/register", {
       //   method: "POST",
