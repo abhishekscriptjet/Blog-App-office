@@ -380,7 +380,7 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
         "comment.commentUser": userId,
       });
       const getUserDetails = await UserDetails.findOne({ userid: userId });
-      if (getUserDetails.commentBlog.include(blogID)) {
+      if (!getUserDetails.commentBlog.includes(blogID)) {
         const updateUserDetails = await UserDetails.findOneAndUpdate(
           { userid: userId },
           { $push: { commentBlog: blogID } },
@@ -462,11 +462,17 @@ router.put("/deleteblogcomment", fetchuser, async (req, res) => {
     const blogID = req.body.blogId;
     const blogs = await blog.findOne({ _id: blogID });
     if (blogs) {
-      const userDetails = await UserDetails.findOneAndUpdate(
-        { userid: userId },
-        { $pull: { commentBlog: blogID } },
-        { new: true }
-      );
+      blogs.comment.map(async (cmt) => {
+        if (cmt.commentUser === userId) {
+          if (cmt.data.length === 1) {
+            const userDetails = await UserDetails.findOneAndUpdate(
+              { userid: userId },
+              { $pull: { commentBlog: blogID } },
+              { new: true }
+            );
+          }
+        }
+      });
       const query = { _id: blogID };
       const updateDocument = {
         $pull: {

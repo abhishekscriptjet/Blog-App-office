@@ -301,7 +301,6 @@ export default function Blogcard(props) {
                       cmt={cmt}
                       user={user}
                       handleDeleteComment={handleDeleteComment}
-                      commentDisplay={commentDisplay}
                     />
                   </div>
                 );

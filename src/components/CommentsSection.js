@@ -14,10 +14,8 @@ export default function CommentsSection(props) {
     // const commentUserID = {
     //   id: commentUser,
     // };
-    if (props.commentDisplay === "block") {
-      // setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
-      setCommentUserDetails([userDetails]);
-    }
+    // setCommentUserDetails(await getCommentUserDetailsBe(commentUserID));
+    setCommentUserDetails([userDetails]);
   };
 
   useEffect(() => {
