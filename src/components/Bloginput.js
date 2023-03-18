@@ -27,7 +27,6 @@ export default function Bloginput(props) {
   };
 
   const handleImageOnChange = async (e) => {
-    console.log("1");
     const file = e.target.files[0];
     if (file) {
       const src = await convertToBase64(file);

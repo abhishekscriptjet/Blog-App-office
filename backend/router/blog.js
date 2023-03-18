@@ -63,6 +63,19 @@ router.get("/getuser", fetchuser, async (req, res) => {
 router.get("/getuserblogs", fetchuser, async (req, res) => {
   try {
     const blogs = await blog.find({ userid: req.userid });
+    const blogsUserDetails = await UserDetails.findOne({ userid: req.userid });
+    let blogsWithUserDetails = [];
+    let blogArray = blogs;
+    for (let index = 0; index < blogArray.length; index++) {
+      const element = blogArray[index];
+      {
+        blogsWithUserDetails.push({
+          ...element,
+          userDetails: blogsUserDetails,
+        });
+      }
+    }
+    console.log("userDetails ", blogsWithUserDetails);
     res.status(200).json({ success: true, blogs, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });

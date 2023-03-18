@@ -4,7 +4,7 @@ import context from "./context";
 
 function ContextBlog(props) {
   const navigate = useNavigate();
-  const networkOrigin = "http://192.168.29.234:5000";
+  const networkOrigin = "http://192.168.29.49:5000";
   const localOrigin = "http://localhost:5000";
   const [alert, setAlert] = useState(null);
   const [userBlog, setUserBlog] = useState([]);

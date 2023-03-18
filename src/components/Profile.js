@@ -3,6 +3,7 @@ import context from "../contextAPI/context";
 import { Link, useNavigate } from "react-router-dom";
 import UserIcon from "../sources/user.png";
 import UserDisplay from "./UserDisplay";
+import Blogcard from "./Blogcard";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -146,6 +147,14 @@ export default function Profile() {
     setFollow(allUser);
   };
 
+  const [viewBlog, setViewBlog] = useState({});
+
+  const handleClickBlog = (blog) => {
+    setViewBlog(blog);
+    clickFollowingRef.current.click();
+    console.log("blog ", blog);
+  };
+
   return (
     <div>
       <button
@@ -199,6 +208,7 @@ export default function Profile() {
                       );
                     })
                   : ""}
+                {viewBlog._id ? <Blogcard blog={viewBlog} user={user} /> : ""}
               </div>
             </div>
             <div className="modal-footer">
@@ -391,9 +401,10 @@ export default function Profile() {
                           >
                             <img
                               src={blog.src}
-                              style={{ height: "13rem" }}
+                              style={{ height: "13rem", cursor: "pointer" }}
                               alt="1"
                               className="w-100 rounded-3"
+                              onClick={() => handleClickBlog(blog)}
                             />
                           </div>
                         );
