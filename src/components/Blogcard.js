@@ -136,7 +136,8 @@ export default function Blogcard(props) {
     setcommentText(value);
   };
 
-  const handleClickSendComment = async () => {
+  const handleClickSendComment = async (e) => {
+    e.preventDefault();
     const blogID = {
       id: _id,
       text: commentText,
@@ -266,29 +267,28 @@ export default function Blogcard(props) {
         </div>
         <hr className="my-0 mx-3" />
         <div className="mx-2">
-          <div className="input-group input-group-sm mb-0 mt-3 mx-2">
-            <span className="input-group-text" id="inputGroup-sizing-sm">
-              Comment
-            </span>
+          <form onSubmit={handleClickSendComment}>
+            <div className="input-group input-group-sm mb-0 mt-3 mx-2">
+              <span className="input-group-text" id="inputGroup-sizing-sm">
+                Comment
+              </span>
 
-            <input
-              type="text"
-              className="form-control w-25 "
-              aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-sm"
-              value={commentText}
-              onChange={handleOnChangeComment}
-            />
+              <input
+                type="text"
+                className="form-control w-25 "
+                aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm"
+                value={commentText}
+                onChange={handleOnChangeComment}
+              />
 
-            <button
-              className="btn btn-secondary border border-1 fw-bold"
-              onClick={handleClickSendComment}
-            >
-              Send
-            </button>
+              <button className="btn btn-secondary border border-1 fw-bold">
+                Send
+              </button>
 
-            <i className="fa-regular fa-paper-plane fs-4 text-muted mx-2 p-2 my-auto"></i>
-          </div>
+              <i className="fa-regular fa-paper-plane fs-4 text-muted mx-2 p-2 my-auto"></i>
+            </div>
+          </form>
 
           {commentsValue.length === 0 ? (
             <div className={`d-${commentDisplay} mb-1 mt-3`}></div>
