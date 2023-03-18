@@ -24,7 +24,6 @@ export default function Profile() {
   const [clickUserBlog, setClickUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
-  console.log("user ", clickUserDetails);
 
   const loadData = async () => {
     const clickUserId = localStorage.getItem("clickUserId");

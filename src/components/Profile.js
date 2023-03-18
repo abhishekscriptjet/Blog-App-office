@@ -30,7 +30,6 @@ export default function Profile() {
     setUserBlog(await getUserBlogs());
     setUserDetail(userDetails);
   };
-  // console.log("userDetails ", userDetails);
 
   useEffect(() => {
     if (localStorage.getItem("blogToken")) {

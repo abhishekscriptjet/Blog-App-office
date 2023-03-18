@@ -62,8 +62,10 @@ router.post("/createuserdetails", fetchuser, async (req, res) => {
           profileImg: profileImg,
           noOfPost: blogs.length,
           following: [],
+          follower: [],
           likedBlog: [],
           disLikedBlog: [],
+          commentBlog: [],
           userDetailsDate: new Date(),
         });
         const createUserDetails = await userDetails.save();
@@ -114,97 +116,102 @@ router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
   try {
     const data = await UserDetails.findOne({ userid: req.userid });
     if (data) {
-      // const details = await UserDetails.findByIdAndRemove(data._id);
-      data.follower.map(async (flwr) => {
+      await data.follower.map(async (flwr) => {
         const followerUserDetails = await UserDetails.findOne({ userid: flwr });
-        if (followerUserDetails.following.includes(req.userid)) {
-          console.log("following remove");
-          const details = await UserDetails.findOneAndUpdate(
-            { userid: flwr },
-            { $pull: { following: req.userid } }
-          );
+        if (followerUserDetails) {
+          if (followerUserDetails.following.includes(req.userid)) {
+            const details = await UserDetails.findOneAndUpdate(
+              { userid: flwr },
+              { $pull: { following: req.userid } }
+            );
+          }
         }
       });
 
-      data.following.map(async (flwg) => {
+      await data.following.map(async (flwg) => {
         const followingUserDetails = await UserDetails.findOne({
           userid: flwg,
         });
-        if (followingUserDetails.follower.includes(req.userid)) {
-          console.log("follower remove");
-          const details = await UserDetails.findOneAndUpdate(
-            { userid: flwg },
-            { $pull: { follower: req.userid } }
-          );
-        }
-      });
-
-      data.likedBlog.map(async (blg) => {
-        const likedBlogDetails = await blog.findOne({ _id: blg });
-        if (likedBlogDetails.upVote.includes(req.userid)) {
-          console.log("upVote remove");
-          const details = await blog.findOneAndUpdate(
-            { _id: blg },
-            { $pull: { upVote: req.userid } }
-          );
-        }
-      });
-
-      data.disLikedBlog.map(async (blg) => {
-        const disLikedBlogDetails = await blog.findOne({ _id: blg });
-        if (disLikedBlogDetails.downVote.includes(req.userid)) {
-          console.log("downVote remove");
-          const details = await blog.findOneAndUpdate(
-            { _id: blg },
-            { $pull: { downVote: req.userid } }
-          );
-        }
-      });
-
-      data.commentBlog.map(async (blg) => {
-        const disLikedBlogDetails = await blog.findOne({ _id: blg });
-        disLikedBlogDetails.comment.map(async (cmt) => {
-          if (cmt.commetUser.includes(req.userid)) {
-            console.log("downVote remove");
-            const details = await blog.findOneAndUpdate(
-              { _id: blg },
-              { $pull: { comment: { commetUser: req.userid } } },
-              false, // Upsert
-              true // Multi
+        if (followingUserDetails) {
+          if (followingUserDetails.follower.includes(req.userid)) {
+            const details = await UserDetails.findOneAndUpdate(
+              { userid: flwg },
+              { $pull: { follower: req.userid } }
             );
           }
-        });
+        }
+      });
+
+      await data.likedBlog.map(async (blg) => {
+        const likedBlogDetails = await blog.findById(blg);
+        if (likedBlogDetails) {
+          if (likedBlogDetails.upVote.includes(req.userid)) {
+            const details = await blog.findOneAndUpdate(
+              { _id: blg },
+              { $pull: { upVote: req.userid } }
+            );
+          }
+        }
+      });
+
+      await data.disLikedBlog.map(async (blg) => {
+        const disLikedBlogDetails = await blog.findById(blg);
+        if (disLikedBlogDetails) {
+          if (disLikedBlogDetails.downVote.includes(req.userid)) {
+            const details = await blog.findOneAndUpdate(
+              { _id: blg },
+              { $pull: { downVote: req.userid } }
+            );
+          }
+        }
+      });
+
+      await data.commentBlog.map(async (blg) => {
+        const commentBlogDetails = await blog.findOne({ _id: blg });
+        if (commentBlogDetails) {
+          commentBlogDetails.comment.map(async (cmt) => {
+            let commentUserId = cmt.commentUser;
+            if (commentUserId.toString() === req.userid) {
+              const details = await blog.findOneAndUpdate(
+                { _id: blg },
+                { $pull: { comment: { commentUser: req.userid } } }
+              );
+            }
+          });
+        }
       });
 
       const userBlog = await blog.find({ userid: req.userid });
-      if (userBlog.length > 0) {
-        userBlog.map((blg) => {
-          if (blg.userid === req.userid) {
-            const blogID = blg._id;
 
+      if (userBlog.length > 0) {
+        userBlog.map(async (blg) => {
+          const blogUserId = blg.userid;
+          const blogID = blg._id;
+
+          if (blogUserId.toString() === req.userid) {
             let like = blg.upVote;
-            like.map(async (id) => {
+            await like.map(async (id) => {
               const likeUserDetails = await UserDetails.findOneAndUpdate(
                 { userid: id },
-                { $pull: { likedBlog: blogID } },
+                { $pull: { likedBlog: blogID.toString() } },
                 { new: true }
               );
             });
 
             let disLike = blg.downVote;
-            disLike.map(async (id) => {
+            await disLike.map(async (id) => {
               const disLikeUserDetails = await UserDetails.findOneAndUpdate(
                 { userid: id },
-                { $pull: { disLikedBlog: blogID } },
+                { $pull: { disLikedBlog: blogID.toString() } },
                 { new: true }
               );
             });
 
             let comment = blg.comment;
-            comment.map(async (comment) => {
+            await comment.map(async (comment) => {
               const commentUserDetails = await UserDetails.findOneAndUpdate(
                 { userid: comment.commentUser },
-                { $pull: { commentBlog: blogID } },
+                { $pull: { commentBlog: blogID.toString() } },
                 { new: true }
               );
             });
@@ -212,7 +219,12 @@ router.delete("/deleteuserdetails", fetchuser, async (req, res) => {
         });
       }
 
-      res.status(200).json({ success: true, msg: "Details Deleted" });
+      const user = await User.findByIdAndDelete(req.userid);
+      const details = await UserDetails.findByIdAndRemove(data._id);
+      const deleteUserBlog = await blog.deleteMany({
+        userid: req.userid,
+      });
+      res.status(200).json({ success: true, msg: "Account Deleted" });
     } else {
       res.status(400).json({ success: false, error: "Not found" });
     }

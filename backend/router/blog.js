@@ -451,7 +451,6 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error ", error);
     res.status(400).json({ success: false, error: "Internel server error" });
   }
 });

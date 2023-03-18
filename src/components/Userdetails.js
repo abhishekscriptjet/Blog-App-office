@@ -878,12 +878,10 @@ const Userdetails = (props) => {
         setStateUserDetails([details]);
         setIsSubmit(false);
         navigate("../profile");
-        console.log("if");
       } else {
         createUserDetails(details);
         setIsSubmit(false);
         navigate("../profile");
-        console.log("else ");
       }
     } else {
       showAlert("Invelid given data.", "danger");
@@ -1075,6 +1073,8 @@ const Userdetails = (props) => {
     if ((name, picture)) {
       await deleteUserDetails();
       clearData();
+      localStorage.removeItem("blogToken");
+      navigate("../login");
     } else {
       showAlert("Details already deleted", "danger");
     }
