@@ -18,8 +18,6 @@ export default function Blogcard(props) {
     userDetails,
   } = props.blog;
 
-  console.log("card blog ", props.blog);
-
   const alertContext = useContext(context);
   const {
     showAlert,
@@ -128,6 +126,7 @@ export default function Blogcard(props) {
   const handleDelete = async () => {
     await deleteEndPoint(_id);
     await props.saveToServer();
+    props.handleCloseViewImage();
   };
   const handleEdit = async () => {
     props.handleEditClick(props.blog);
@@ -166,7 +165,7 @@ export default function Blogcard(props) {
 
   return (
     <div
-      className="card"
+      className="card rounded-0"
       style={{
         width: "inherit",
         backgroundColor: "inherit",
@@ -287,7 +286,6 @@ export default function Blogcard(props) {
               <button className="btn btn-secondary border border-1 fw-bold me-3">
                 Send
               </button>
-
               {/* <i className="fa-regular fa-paper-plane fs-4 text-muted mx-2 p-2 my-auto"></i> */}
             </div>
           </form>

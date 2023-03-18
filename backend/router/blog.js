@@ -63,20 +63,35 @@ router.get("/getuser", fetchuser, async (req, res) => {
 router.get("/getuserblogs", fetchuser, async (req, res) => {
   try {
     const blogs = await blog.find({ userid: req.userid });
-    const blogsUserDetails = await UserDetails.findOne({ userid: req.userid });
-    let blogsWithUserDetails = [];
-    let blogArray = blogs;
-    for (let index = 0; index < blogArray.length; index++) {
-      const element = blogArray[index];
-      {
-        blogsWithUserDetails.push({
-          ...element,
-          userDetails: blogsUserDetails,
+
+    let withUserDetailsBlog = [];
+    let commentUserDetailsBlog = [];
+    for (const iterator of blogs) {
+      const details = await UserDetails.find({
+        userid: iterator.userid,
+      });
+      withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+    }
+    for (const iterator of withUserDetailsBlog) {
+      let commentWithUserDetails = [];
+      for (const iteratorComment of iterator.comment) {
+        const details = await UserDetails.find({
+          userid: iteratorComment.commentUser,
+        });
+        commentWithUserDetails.push({
+          ...iteratorComment,
+          userDetails: details[0],
         });
       }
+      commentUserDetailsBlog.push({
+        ...iterator,
+        comment: commentWithUserDetails,
+      });
     }
-    console.log("userDetails ", blogsWithUserDetails);
-    res.status(200).json({ success: true, blogs, msg: "Loaded" });
+
+    res
+      .status(200)
+      .json({ success: true, blogs: commentUserDetailsBlog, msg: "Loaded" });
   } catch (error) {
     res.status(400).json({ success: false, error: "Internel server error" });
   }

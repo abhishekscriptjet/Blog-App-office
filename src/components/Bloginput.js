@@ -74,24 +74,6 @@ export default function Bloginput(props) {
     //eslint-disable-next-line
   }, [editClick]);
 
-  const handleOnSubmit = async () => {
-    closeRef.current.click();
-    fileInputRef.current.value = "";
-    if (editClick) {
-      await editBlog({
-        ...editClick,
-        ...blog,
-      });
-      await resetEditClick();
-      setBlog({ ...blog, topic: "", description: "" });
-    } else {
-      await createBlog(blog);
-      await resetEditClick();
-      setBlog({ topic: "", description: "", src: "" });
-    }
-    props.saveToServer();
-  };
-
   const handleCrossIcon = async () => {
     await resetEditClick();
     fileInputRef.current.value = "";
@@ -101,6 +83,27 @@ export default function Bloginput(props) {
   const handleClear = () => {
     fileInputRef.current.value = "";
     setBlog({ ...blog, src: "" });
+  };
+
+  const handleOnSubmit = async () => {
+    closeRef.current.click();
+    if (blog.description && blog.src && blog.topic) {
+      if (editClick) {
+        await editBlog({
+          ...editClick,
+          ...blog,
+        });
+        await resetEditClick();
+        handleCrossIcon();
+      } else {
+        await createBlog(blog);
+        await resetEditClick();
+        handleCrossIcon();
+      }
+      props.saveToServer();
+    } else {
+      handleCrossIcon();
+    }
   };
 
   return (
@@ -180,6 +183,7 @@ export default function Bloginput(props) {
           type="button"
           className="btn btn-secondary"
           data-bs-dismiss="modal"
+          onClick={handleCrossIcon}
         >
           Close
         </button>

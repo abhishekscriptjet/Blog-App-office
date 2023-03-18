@@ -55,12 +55,12 @@ export default function CommentsSection(props) {
         ) : (
           ""
         )}
-        <div className="d-flex flex-column me-3">
+        <div className="d-flex flex-column me-3 mb-3">
           {data
             ? data.map((cmt, i) => {
                 return (
-                  <div className="mb-1 border" key={i}>
-                    <div className="d-flex justify-content-between align-items-center text-muted ps-3 pe-2 py-1 ms-5 mb-0 rounded bg-white ">
+                  <div className="mb-1 border rounded ms-5" key={i}>
+                    <div className="d-flex justify-content-between align-items-center text-muted ps-3 pe-2 py-1 ms-0 mb-0 rounded bg-white ">
                       {cmt.text}
                       <div className="ms-auto text-end">
                         <div

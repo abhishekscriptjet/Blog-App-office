@@ -4,10 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import UserIcon from "../sources/user.png";
 import UserDisplay from "./UserDisplay";
 import Blogcard from "./Blogcard";
+import Bloginput from "./Bloginput";
 
 export default function Profile() {
   const navigate = useNavigate();
   const clickFollowingRef = useRef(null);
+  const clickViewImageRef = useRef(null);
+  const clickViewImageCloseRef = useRef(null);
+  const clickEdit = useRef(null);
   const contextBlog = useContext(context);
   const {
     user,
@@ -25,6 +29,7 @@ export default function Profile() {
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
   const [userDetail, setUserDetail] = useState([]);
+  const [editClick, setEditClick] = useState(false);
   // const [timeOut, setTimeOut] = useState(false);
 
   const loadData = async () => {
@@ -50,7 +55,9 @@ export default function Profile() {
 
   // useEffect(() => {}, [timeOut]);
 
-  const handleClose = () => {};
+  const handleClose = () => {
+    setViewBlog({});
+  };
 
   const capitaliz = (string) => {
     let str = string.charAt(0).toUpperCase() + string.slice(1);
@@ -151,25 +158,41 @@ export default function Profile() {
 
   const handleClickBlog = (blog) => {
     setViewBlog(blog);
-    clickFollowingRef.current.click();
-    console.log("blog ", blog);
+    clickViewImageRef.current.click();
+  };
+
+  const saveToServer = async () => {
+    setUserBlog(await getUserBlogs());
+  };
+
+  const resetEditClick = () => {
+    setEditClick(false);
+  };
+
+  const handleEditClick = (blog) => {
+    clickEdit.current.click();
+    setEditClick(blog);
+  };
+
+  const handleCloseViewImage = () => {
+    clickViewImageCloseRef.current.click();
   };
 
   return (
     <div>
+      {/* FOR FOLLOWER AND FOLLOWING DISPLAY */}
       <button
         ref={clickFollowingRef}
         type="button"
         className="btn btn-primary d-none"
         data-bs-toggle="modal"
-        data-bs-target="#exampleModal"
+        data-bs-target="#followingModal"
       >
         Launch demo modal
       </button>
-
       <div
         className="modal fade"
-        id="exampleModal"
+        id="followingModal"
         tabIndex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -185,7 +208,6 @@ export default function Profile() {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={handleClose}
               ></button>
             </div>
             <div className="modal-body d-flex justify-content-center">
@@ -208,7 +230,6 @@ export default function Profile() {
                       );
                     })
                   : ""}
-                {viewBlog._id ? <Blogcard blog={viewBlog} user={user} /> : ""}
               </div>
             </div>
             <div className="modal-footer">
@@ -216,10 +237,58 @@ export default function Profile() {
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
-                onClick={handleClose}
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FOR VIEW IMAGE */}
+      <button
+        ref={clickViewImageRef}
+        type="button "
+        className="btn btn-primary d-none"
+        data-bs-toggle="modal"
+        data-bs-target="#viewImageModal"
+      >
+        Launch demo modal
+      </button>
+      <div
+        className="modal fade"
+        id="viewImageModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog ">
+          <div className="modal-content position-relative">
+            <div
+              className="position-absolute d-flex justify-content-center align-items-center"
+              style={{ right: "43%", top: "-26px", zIndex: "1" }}
+            >
+              <button
+                ref={clickViewImageCloseRef}
+                type="button"
+                className="btn-close bg-danger rounded-circle fs-5 p-3 "
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={handleClose}
+              ></button>
+            </div>
+            <div className="modal-body px-0 pb-0 pt-0  ">
+              {viewBlog._id ? (
+                <Blogcard
+                  blog={viewBlog}
+                  user={user}
+                  saveToServer={saveToServer}
+                  handleEditClick={handleEditClick}
+                  handleCloseViewImage={handleCloseViewImage}
+                />
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
@@ -384,6 +453,38 @@ export default function Profile() {
                   </div>
                   <div className="d-flex justify-content-between align-items-center mb-4">
                     <p className="lead fw-normal mb-0">Recent photos</p>
+                    <div className="me-auto">
+                      {/* FOR CREATE BLOG */}
+                      <button
+                        ref={clickEdit}
+                        type="button"
+                        className="btn btn-primary fw-bold py-2 mx-4"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                      >
+                        Create Your Blog
+                      </button>
+                      {/* <!-- Modal --> */}
+                      <div
+                        className="modal fade"
+                        id="exampleModal"
+                        tabIndex="-1"
+                        aria-labelledby="exampleModalLabel"
+                        aria-hidden="true"
+                      >
+                        <div className="modal-dialog">
+                          <div className="modal-content">
+                            <div className="modal-body">
+                              <Bloginput
+                                saveToServer={saveToServer}
+                                editClick={editClick}
+                                resetEditClick={resetEditClick}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <p className="mb-0">
                       <a href="#!" className="text-muted">
                         {userBlog.length > 0 ? "Show all" : ""}
