@@ -285,6 +285,7 @@ export default function Profile() {
                   saveToServer={saveToServer}
                   handleEditClick={handleEditClick}
                   handleCloseViewImage={handleCloseViewImage}
+                  handleClickOtherUser={handleCloseViewImage}
                 />
               ) : (
                 ""
@@ -500,13 +501,26 @@ export default function Profile() {
                             className="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-2 mb-2"
                             key={blog._id}
                           >
-                            <img
-                              src={blog.src}
-                              style={{ height: "13rem", cursor: "pointer" }}
-                              alt="1"
-                              className="w-100 rounded-3"
-                              onClick={() => handleClickBlog(blog)}
-                            />
+                            {blog.src.slice(0, 10) === "data:image" ? (
+                              <img
+                                src={blog.src}
+                                style={{ height: "13rem", cursor: "pointer" }}
+                                alt="1"
+                                className="w-100 rounded-3"
+                                onClick={() => handleClickBlog(blog)}
+                              />
+                            ) : (
+                              <video
+                                className="w-100 rounded-3"
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleClickBlog(blog)}
+                              >
+                                <source src={blog.src} type="video/mp4" />
+                                Sorry, your browser
+                              </video>
+                            )}
                           </div>
                         );
                       })

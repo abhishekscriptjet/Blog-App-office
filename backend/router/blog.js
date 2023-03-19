@@ -115,7 +115,7 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
       .find({
         userid: [...following, req.userid],
       })
-      .sort({ date: -1 })
+      .sort({ date: 1 })
       .limit(req.params.size);
 
     let withUserDetailsBlog = [];
@@ -424,7 +424,13 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
             $push: {
               comment: {
                 commentUser: userId,
-                data: [{ text: req.body.text, commentDate: new Date() }],
+                data: [
+                  {
+                    text: req.body.text,
+                    commentDate: new Date(),
+                    commentId: new Date().valueOf(),
+                  },
+                ],
               },
             },
           },
@@ -452,6 +458,7 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
             "comment.$[user].data": {
               text: req.body.text,
               commentDate: new Date(),
+              commentId: new Date().valueOf(),
             },
           },
         };
@@ -504,8 +511,7 @@ router.put("/deleteblogcomment", fetchuser, async (req, res) => {
       const updateDocument = {
         $pull: {
           "comment.$[user].data": {
-            text: req.body.text,
-            commentDate: req.body.date,
+            commentId: req.body.commentId,
           },
         },
       };
@@ -551,9 +557,34 @@ router.post("/getclickuserblog", fetchuser, async (req, res) => {
     const ClickUserBlog = await blog.find({
       userid: req.body.id,
     });
+
+    let withUserDetailsBlog = [];
+    let commentUserDetailsBlog = [];
+    for (const iterator of ClickUserBlog) {
+      const details = await UserDetails.find({
+        userid: iterator.userid,
+      });
+      withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+    }
+    for (const iterator of withUserDetailsBlog) {
+      let commentWithUserDetails = [];
+      for (const iteratorComment of iterator.comment) {
+        const details = await UserDetails.find({
+          userid: iteratorComment.commentUser,
+        });
+        commentWithUserDetails.push({
+          ...iteratorComment,
+          userDetails: details[0],
+        });
+      }
+      commentUserDetailsBlog.push({
+        ...iterator,
+        comment: commentWithUserDetails,
+      });
+    }
     res.status(200).json({
       success: true,
-      ClickUserBlog: ClickUserBlog,
+      ClickUserBlog: commentUserDetailsBlog,
       msg: "Get User Blog",
     });
   } catch (error) {

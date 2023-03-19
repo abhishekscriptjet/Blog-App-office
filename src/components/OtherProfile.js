@@ -3,10 +3,13 @@ import context from "../contextAPI/context";
 import { Link, useNavigate } from "react-router-dom";
 import UserIcon from "../sources/user.png";
 import UserDisplay from "./UserDisplay";
+import Blogcard from "./Blogcard";
 
 export default function Profile() {
   const navigate = useNavigate();
   const clickFollowingRef = useRef(null);
+  const clickViewImageRef = useRef(null);
+  const clickViewImageCloseRef = useRef(null);
   const contextBlog = useContext(context);
   const {
     user,
@@ -24,6 +27,7 @@ export default function Profile() {
   const [clickUserBlog, setClickUserBlog] = useState([]);
   const [follow, setFollow] = useState([]);
   const [modelName, setModelName] = useState();
+  const [viewBlog, setViewBlog] = useState({});
 
   const loadData = async () => {
     const clickUserId = localStorage.getItem("clickUserId");
@@ -45,6 +49,7 @@ export default function Profile() {
 
   const handleClose = () => {
     setFollow([]);
+    setViewBlog({});
   };
 
   const capitaliz = (string) => {
@@ -73,6 +78,10 @@ export default function Profile() {
       setFollow(await getClickFollowerBe(id));
       clickFollowingRef.current.click();
     }
+  };
+
+  const handleClickOtherUser = async (data) => {
+    clickViewImageCloseRef.current.click();
   };
 
   const handleFollow = async (id) => {
@@ -141,21 +150,27 @@ export default function Profile() {
     setFollow(allUser);
   };
 
+  const handleClickBlog = (blog) => {
+    setViewBlog(blog);
+    clickViewImageRef.current.click();
+  };
+
   return (
     <div>
+      {/* FOR FOLLOWER AND FOLLOWING DISPLAY */}
       <button
         ref={clickFollowingRef}
         type="button"
         className="btn btn-primary d-none"
         data-bs-toggle="modal"
-        data-bs-target="#exampleModal"
+        data-bs-target="#followModal"
       >
         Launch demo modal
       </button>
 
       <div
         className="modal fade"
-        id="exampleModal"
+        id="followModal"
         tabIndex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -209,6 +224,52 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      {/* FOR VIEW IMAGE */}
+      <button
+        ref={clickViewImageRef}
+        type="button "
+        className="btn btn-primary d-none"
+        data-bs-toggle="modal"
+        data-bs-target="#viewImageModal"
+      >
+        Launch demo modal
+      </button>
+      <div
+        className="modal fade"
+        id="viewImageModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog ">
+          <div className="modal-content position-relative">
+            <div
+              className="position-absolute d-flex justify-content-center align-items-center"
+              style={{ right: "43%", top: "-26px", zIndex: "1" }}
+            >
+              <button
+                ref={clickViewImageCloseRef}
+                type="button"
+                className="btn-close bg-danger rounded-circle fs-5 p-3 "
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={handleClose}
+              ></button>
+            </div>
+            <div className="modal-body px-0 pb-0 pt-0  ">
+              {viewBlog._id ? (
+                <Blogcard
+                  blog={viewBlog}
+                  user={user}
+                  handleClickOtherUser={handleClickOtherUser}
+                />
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       <section className="h-100 gradient-custom-2 w-100" style={{}}>
         <div className=" py-0 h-100 w-100">
           <div className="row d-flex justify-content-center align-items-center h-100">
@@ -226,6 +287,8 @@ export default function Profile() {
                       src={
                         clickUserDetails.length > 0
                           ? clickUserDetails[0].profileImg
+                            ? clickUserDetails[0].profileImg
+                            : UserIcon
                           : UserIcon
                       }
                       alt="Generic placeholder"
@@ -373,12 +436,26 @@ export default function Profile() {
                             className="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-2 mb-2"
                             key={blog._id}
                           >
-                            <img
-                              src={blog.src}
-                              style={{ height: "13rem" }}
-                              alt="1"
-                              className="w-100 rounded-3"
-                            />
+                            {blog.src.slice(0, 10) === "data:image" ? (
+                              <img
+                                src={blog.src}
+                                style={{ height: "13rem", cursor: "pointer" }}
+                                alt="1"
+                                className="w-100 rounded-3"
+                                onClick={() => handleClickBlog(blog)}
+                              />
+                            ) : (
+                              <video
+                                className="w-100 rounded-3"
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleClickBlog(blog)}
+                              >
+                                <source src={blog.src} type="video/mp4" />
+                                Sorry, your browser
+                              </video>
+                            )}
                           </div>
                         );
                       })

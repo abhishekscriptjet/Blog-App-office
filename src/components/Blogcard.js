@@ -143,12 +143,12 @@ export default function Blogcard(props) {
       id: _id,
       text: commentText,
     };
+    setcommentText("");
     if (commentText !== "") {
       setCommentsValue(await setBlogCommentBe(blogID));
     } else {
       showAlert("Can not send without comment", "danger");
     }
-    setcommentText("");
   };
 
   const handleDeleteComment = async (id) => {
@@ -235,12 +235,19 @@ export default function Blogcard(props) {
       </div>
 
       <div className="card-body p-0">
-        <img
-          src={src}
-          className="card-img-top rounded-0"
-          alt="..."
-          style={{ width: "100%", height: "50%" }}
-        />
+        {src.slice(0, 10) === "data:image" ? (
+          <img
+            src={src}
+            className="card-img-top rounded-0"
+            alt="..."
+            style={{ width: "100%", height: "50%" }}
+          />
+        ) : (
+          <video controls loop width="100%">
+            <source src={src} type="video/mp4" />
+            Sorry, your browser
+          </video>
+        )}
         <div className="card-body">
           <h5 className="card-title">{topic}</h5>
           <p className="card-text">{description}</p>

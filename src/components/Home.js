@@ -65,11 +65,6 @@ export default function Home() {
   };
 
   const handleFollow = async (id) => {
-    let userid = { id: id };
-    setFollowing(userid);
-    setUserBlog(await getFollowingBlog(size));
-    setUserBlog(await getFollowingBlog(size));
-
     let allUser = allusers;
     for (let index = 0; index < allUser.length; index++) {
       const element = allUser[index];
@@ -123,11 +118,18 @@ export default function Home() {
     });
     setStateUserDetails(updatedUserDetails);
     setAllusers(allUser);
+
+    let userid = { id: id };
+    setUserBlog(await setFollowing(userid));
   };
 
   const handleClickOtherUser = async (data) => {
-    localStorage.setItem("clickUserId", data.userid);
-    navigate("./clickuser");
+    if (data.userid === user._id) {
+      navigate("./profile");
+    } else {
+      localStorage.setItem("clickUserId", data.userid);
+      navigate("./clickuser");
+    }
   };
 
   const topicFilter = async (topic) => {

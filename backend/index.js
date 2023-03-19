@@ -6,9 +6,9 @@ const port = 5000;
 const host = "http://localhost";
 dbConnnect();
 
-app.use(express.json({ limit: "10mb", extended: true }));
+app.use(express.json({ limit: "5mb", extended: true }));
 app.use(
-  express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })
+  express.urlencoded({ limit: "5mb", extended: true, parameterLimit: 50000 })
 );
 app.use(express.json());
 app.use((req, res, next) => {

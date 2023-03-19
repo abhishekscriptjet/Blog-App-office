@@ -267,6 +267,7 @@ router.put("/setfollowing", fetchuser, async (req, res) => {
     const oldFollowing = oldDetails[0].following;
     const include = oldFollowing.includes(followingID.toString());
     if (!include && followingID !== req.userid) {
+      //To Set Follow
       const details = await UserDetails.findOneAndUpdate(
         { userid: req.userid },
         { $push: { following: followingID } },
@@ -277,22 +278,81 @@ router.put("/setfollowing", fetchuser, async (req, res) => {
         { $push: { follower: req.userid } },
         { new: true }
       );
+      const getFollowingBlog = await blog.find({
+        userid: [...details.following, req.userid],
+      });
+      let withUserDetailsBlog = [];
+      let commentUserDetailsBlog = [];
+      for (const iterator of getFollowingBlog) {
+        const details = await UserDetails.find({
+          userid: iterator.userid,
+        });
+        withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+      }
+      for (const iterator of withUserDetailsBlog) {
+        let commentWithUserDetails = [];
+        for (const iteratorComment of iterator.comment) {
+          const details = await UserDetails.find({
+            userid: iteratorComment.commentUser,
+          });
+          commentWithUserDetails.push({
+            ...iteratorComment,
+            userDetails: details[0],
+          });
+        }
+        commentUserDetailsBlog.push({
+          ...iterator,
+          comment: commentWithUserDetails,
+        });
+      }
       res.status(200).json({
         success: true,
+        getFollowingBlog: commentUserDetailsBlog,
         msg: "Follow done",
       });
     } else {
+      //To Set UnFollow
       const unFollowId = req.body.id;
       const details = await UserDetails.findOneAndUpdate(
         { userid: req.userid },
-        { $pull: { following: unFollowId } }
+        { $pull: { following: unFollowId } },
+        { new: true }
       );
       const addFollower = await UserDetails.findOneAndUpdate(
         { userid: unFollowId },
-        { $pull: { follower: req.userid } }
+        { $pull: { follower: req.userid } },
+        { new: true }
       );
+      const getFollowingBlog = await blog.find({
+        userid: [...details.following, req.userid],
+      });
+      let withUserDetailsBlog = [];
+      let commentUserDetailsBlog = [];
+      for (const iterator of getFollowingBlog) {
+        const details = await UserDetails.find({
+          userid: iterator.userid,
+        });
+        withUserDetailsBlog.push({ ...iterator._doc, userDetails: details[0] });
+      }
+      for (const iterator of withUserDetailsBlog) {
+        let commentWithUserDetails = [];
+        for (const iteratorComment of iterator.comment) {
+          const details = await UserDetails.find({
+            userid: iteratorComment.commentUser,
+          });
+          commentWithUserDetails.push({
+            ...iteratorComment,
+            userDetails: details[0],
+          });
+        }
+        commentUserDetailsBlog.push({
+          ...iterator,
+          comment: commentWithUserDetails,
+        });
+      }
       res.status(200).json({
         success: true,
+        getFollowingBlog: commentUserDetailsBlog,
         msg: "Unfollow done",
       });
     }

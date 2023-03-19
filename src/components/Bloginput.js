@@ -57,7 +57,7 @@ export default function Bloginput(props) {
   };
 
   useEffect(() => {
-    loadImage(blog.src);
+    // loadImage(blog.src);
     //eslint-disable-next-line
   }, [blog.src]);
 
@@ -144,14 +144,22 @@ export default function Bloginput(props) {
           className="form-control"
           type="file"
           id="src"
-          accept=".jpeg, .png, .jpg"
+          accept=".jpeg, .png, .jpg, .mp4, .mkv, .mp3,audio/*,video/*,image/*"
           onChange={handleImageOnChange}
         />
-        {blog.src && (
-          <canvas
+        {blog.src.slice(0, 10) === "data:image" && (
+          <img
+            src={blog.src}
             className="btn btn-outline-dark bg-white p-0 m-0 ms-3 "
-            ref={canvasRef}
+            alt="..."
+            style={{ width: "14%" }}
           />
+        )}
+        {blog.src.slice(0, 10) === "data:video" && (
+          <video controls loop className="container w-50">
+            <source src={blog.src} type="video/mp4" />
+            Sorry, your browser
+          </video>
         )}
         {blog.src && (
           <button

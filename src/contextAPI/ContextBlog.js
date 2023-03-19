@@ -280,6 +280,8 @@ function ContextBlog(props) {
     const res = await response.json();
     if (res.success) {
       showAlert(res.msg, "success");
+      console.log(res.getFollowingBlog);
+      return res.getFollowingBlog;
     } else {
       showAlert(res.error, "danger");
     }
