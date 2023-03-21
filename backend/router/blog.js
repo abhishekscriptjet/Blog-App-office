@@ -115,7 +115,7 @@ router.get("/getfollowingblog/:size", fetchuser, async (req, res) => {
       .find({
         userid: [...following, req.userid],
       })
-      .sort({ date: 1 })
+      .sort({ date: -1 })
       .limit(req.params.size);
 
     let withUserDetailsBlog = [];
@@ -428,7 +428,7 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
                   {
                     text: req.body.text,
                     commentDate: new Date(),
-                    commentId: new Date().valueOf(),
+                    _id: new Date().valueOf(),
                   },
                 ],
               },
@@ -458,7 +458,7 @@ router.put("/setblogcomment", fetchuser, async (req, res) => {
             "comment.$[user].data": {
               text: req.body.text,
               commentDate: new Date(),
-              commentId: new Date().valueOf(),
+              _id: new Date().valueOf(),
             },
           },
         };

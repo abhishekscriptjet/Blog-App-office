@@ -243,7 +243,7 @@ export default function Blogcard(props) {
             style={{ width: "100%", height: "50%" }}
           />
         ) : (
-          <video controls loop width="100%">
+          <video controls loop autoPlay width="100%">
             <source src={src} type="video/mp4" />
             Sorry, your browser
           </video>

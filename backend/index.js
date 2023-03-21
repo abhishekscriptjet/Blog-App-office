@@ -1,5 +1,6 @@
 const express = require("express");
 const dbConnnect = require("./db");
+const ApiVideoClient = require("@api.video/nodejs-client");
 
 const app = express();
 const port = 5000;
@@ -25,6 +26,45 @@ app.use((req, res, next) => {
 app.use("/auth", require("./router/auth"));
 app.use("/blog", require("./router/blog"));
 app.use("/user", require("./router/userData"));
+// app.use("/api", require("./router/uploadTokens"));
+
+const http = require("http");
+
+app.use(async (req, res) => {
+  // console.log(req.url);
+  if (req.url === "/api/uploadTokens") {
+    try {
+      const client = new ApiVideoClient({
+        apiKey: process.env.API_KEY,
+      });
+      if (req.method === "GET") {
+        const uploadTokensList = await client.uploadTokens.list();
+        // console.log("GET");
+        res.status(200).json({ uploadTokensList });
+      } else if (req.method === "POST") {
+        const newUploadToken = await client.uploadTokens.createToken();
+        // console.log("POST");
+        res.status(200).json({ newUploadToken });
+      } else res.status(405).send("METHOD NOT ALLOWED");
+    } catch (error) {
+      res.status(401).send(error);
+    }
+  }
+});
+
+//   if (req.method !== "GET") {
+//     res.end(`{"error": "${http.STATUS_CODES[405]}"}`);
+//   } else {
+//     if (req.url === "/") {
+//       res.end(`<h1>Hello World</h1>`);
+//     }
+//     if (req.url === "/hello") {
+//       res.end(`<h1>Hello</h1>`);
+//     }
+//   }
+//   res.end(`{"error": "${http.STATUS_CODES[404]}"}`);
+// });
+
 app.listen(port, () => {
   console.log(`server Start at port ${host}:${port}`);
 });

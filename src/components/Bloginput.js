@@ -1,22 +1,54 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
 import context from "../contextAPI/context";
+import { UploadButton } from "@api.video/react-upload-button";
 
 export default function Bloginput(props) {
   const editClick = props.editClick;
   const resetEditClick = props.resetEditClick;
 
   const alertContext = useContext(context);
-  const { createBlog, editBlog } = alertContext;
+  const { createBlog, editBlog, user } = alertContext;
 
   const closeRef = useRef();
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  const [uploadToken, setUploadToken] = useState();
+  const [progress, setProgress] = useState(0);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const [videoID, setVideoID] = useState();
   const [blog, setBlog] = useState({
     topic: "",
     src: "",
     description: "",
   });
+
+  const instantiateUploadToken = async () => {
+    const networkOrigin = "http://192.168.29.49:5000";
+    const localOrigin = "http://localhost:5000";
+    const list = await fetch(
+      `${networkOrigin || localOrigin}/api/uploadTokens`,
+      {
+        method: "GET",
+      }
+    ).then((res) => res.json());
+    const tokenList = list.uploadTokensList.data;
+    if (tokenList.length > 0) {
+      setUploadToken(tokenList[0].token);
+    } else {
+      if (!uploadToken) {
+        const newUploadToken = await fetch(
+          `${networkOrigin || localOrigin}/api/uploadTokens`,
+          {
+            method: "POST",
+          }
+        );
+        let token = await newUploadToken.json();
+        setUploadToken(token.newUploadToken.token);
+      }
+    }
+  };
 
   const handleOnChange = (e) => {
     const name = e.target.name;
@@ -28,7 +60,7 @@ export default function Bloginput(props) {
 
   const handleImageOnChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file.type.slice(0, 5) === "image") {
       const src = await convertToBase64(file);
       setBlog({ ...blog, src: src });
     } else {
@@ -57,6 +89,7 @@ export default function Bloginput(props) {
   };
 
   useEffect(() => {
+    instantiateUploadToken();
     // loadImage(blog.src);
     //eslint-disable-next-line
   }, [blog.src]);
@@ -74,6 +107,19 @@ export default function Bloginput(props) {
     //eslint-disable-next-line
   }, [editClick]);
 
+  const deleteVideo = async () => {
+    if (videoID) {
+      const options = await fetch(`https://ws.api.video/videos/${videoID}`, {
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          authorization: "Basic JAqzECJrDpOWvrpdSnVDT1RBLqmKgtRayGq9T9kLHsa",
+        },
+      });
+      console.log("delete", options);
+    }
+  };
+
   const handleCrossIcon = async () => {
     await resetEditClick();
     fileInputRef.current.value = "";
@@ -87,6 +133,7 @@ export default function Bloginput(props) {
 
   const handleOnSubmit = async () => {
     closeRef.current.click();
+
     if (blog.description && blog.src && blog.topic) {
       if (editClick) {
         await editBlog({
@@ -95,12 +142,12 @@ export default function Bloginput(props) {
         });
         await resetEditClick();
         handleCrossIcon();
+        props.saveToServer();
       } else {
         await createBlog(blog);
         await resetEditClick();
-        handleCrossIcon();
+        props.saveToServer();
       }
-      props.saveToServer();
     } else {
       handleCrossIcon();
     }
@@ -139,14 +186,50 @@ export default function Bloginput(props) {
       </div>
 
       <div className="mb-3 d-flex align-items-center justify-content-center position-relative">
+        {/* Displays an upload button */}
+        {uploadToken && (
+          <UploadButton
+            uploadToken={uploadToken}
+            onUploadProgress={(progress) => {
+              // Make your own callback called during the uploading process
+              setSuccess(false);
+              setError(false);
+              setProgress(
+                Math.round((progress.uploadedBytes * 100) / progress.totalBytes)
+              );
+            }}
+            onUploadSuccess={(video) => {
+              // Make your own callback called when the video is uploaded
+              setVideoID(video.videoId);
+              setBlog({ ...blog, src: video.assets.mp4 });
+              setSuccess(true);
+            }}
+            onUploadError={(errorMessage) => {
+              // Make your own callback called if an error occured
+              setError(true);
+              console.log(errorMessage);
+            }}
+            className="border px-0 py-2 text-dark"
+            style={{ fontSize: "1em", width: "40%" }}
+          >
+            Upload video
+          </UploadButton>
+        )}
         <input
           ref={fileInputRef}
           className="form-control"
           type="file"
           id="src"
-          accept=".jpeg, .png, .jpg, .mp4, .mkv, .mp3,audio/*,video/*,image/*"
+          // accept=".jpeg, .png, .jpg, .mp4, .mkv, .mp3,audio/*,video/*,image/*"
+          accept=".jpeg, .png, .jpg"
           onChange={handleImageOnChange}
         />
+        {blog.src && videoID && success && (
+          <video controls loop className="container w-50">
+            <source src={videoID} type="video/mp4" />
+            Sorry, your browser
+          </video>
+        )}
         {blog.src.slice(0, 10) === "data:image" && (
           <img
             src={blog.src}
@@ -155,12 +238,12 @@ export default function Bloginput(props) {
             style={{ width: "14%" }}
           />
         )}
-        {blog.src.slice(0, 10) === "data:video" && (
+        {/* {blog.src.slice(0, 10) === "data:video" && (
           <video controls loop className="container w-50">
             <source src={blog.src} type="video/mp4" />
             Sorry, your browser
           </video>
-        )}
+        )} */}
         {blog.src && (
           <button
             type="button"
